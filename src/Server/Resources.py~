@@ -1,0 +1,633 @@
+import os, os.path
+from flask_restful import Resource
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from flask import Response, request
+from Server.Models import User, RevokedToken
+import re
+import codecs
+import json
+from Util.Const import Const
+from Util.Config import Config
+from Util.Log import Log
+from datetime import datetime, timedelta
+from Util.DataUtil import DataUtil
+from Server.Parsers import analyze_text_parser, analyze_ipfs_parser, analyze_query_parser
+from Server.Messages import Messages
+from Database.Article import Article
+global ipfs_server
+
+class AnalyzeText(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		data	= article_text_parser.parse_args()
+		data	= DataUtil.clean_data(data)
+                article = Article.fromJSON(data)
+                request = Request.fromJSON(article.toJSON())
+                article.flush()
+                request.flush()
+                return {"id": article.id}, 200
+
+class AnalyzeText(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		data	= article_text_parser.parse_args()
+		data	= DataUtil.clean_data(data)
+                article = Article.fromJSON(data)
+                request = Request.fromJSON(article.toJSON())
+                article.flush()
+                request.flush()
+                return {"id": article.id}, 200
+
+
+class Article(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		data			= articles_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		page			= int(data["page"]) if data["page"] else 0
+		nr_results		= int(data["nr_results"]) if data["nr_results"] else 0
+		since			= data["since"]
+		publisher		= get_jwt_identity()
+		count, articles		= Article.changeSet(publisher, since, page, nr_results)
+		msg			= ErrorCodes.ARTICLES_CHANGESET_SUCCESS.copy()
+		msg["count"]		= count
+		msg["data"]		= articles
+		return msg
+
+	
+class Tip(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data			= tip_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		Log.info("Tip - ", data)
+		if not(get_jwt_identity() == data[Const.REQ_READER] or get_jwt_identity() == eos_api.m_issuer_wallet):
+			return ErrorCodes.GENERAL_INVALID_USER
+		response = eos_api.tip(data[Const.REQ_READER], data[Const.REQ_AMOUNT], data[Const.REQ_ARTICLE])
+		Log.info("Tip ", response)
+		return DataUtil.verify_message(response)
+
+
+class Read(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data			= read_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		Log.info("Read", data)
+		#Log.info("Read", request.body)
+		if not(get_jwt_identity() == data[Const.REQ_READER] or get_jwt_identity() == eos_api.m_issuer_wallet):
+			return ErrorCodes.GENERAL_INVALID_USER
+		response = eos_api.read(data[Const.REQ_READER], data[Const.REQ_AMOUNT], data[Const.REQ_ARTICLE])
+		Log.info("Read", response)
+		return DataUtil.verify_message(response)
+
+
+class Buy(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data			= buy_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		if not(get_jwt_identity() == data[Const.REQ_USERNAME] or get_jwt_identity() == eos_api.m_issuer_wallet):
+			return ErrorCodes.GENERAL_INVALID_USER
+		wallet	 = eos_api.m_wallets.wallet_name(data[Const.REQ_USERNAME])
+		response = eos_api.buy(wallet, data[Const.REQ_AMOUNT])
+		return DataUtil.verify_message(response)
+
+
+class Sell(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data			= sell_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		if not(get_jwt_identity() == data[Const.REQ_USERNAME] or get_jwt_identity() == eos_api.m_issuer_wallet):
+			return ErrorCodes.GENERAL_INVALID_USER
+		wallet	 = eos_api.m_wallets.wallet_name(data[Const.REQ_USERNAME])
+		response = eos_api.sell(wallet, data[Const.REQ_AMOUNT])
+		return DataUtil.verify_message(response)
+
+
+class Transfer(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data			= transfer_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+
+		fromUser		= None if not data[Const.REQ_FROM] else data[Const.REQ_FROM]
+		fromUser		= fromUser if not data['fromUser'] else data['fromUser']
+		if (data['fromWallet']):
+			wallet_data	= eos_api.m_wallets.get_user_for_wallet(data['fromWallet'])
+			fromUser	= wallet_data['username']
+		fromWallet		= data['fromWallet'] if data['fromWallet'] else eos_api.m_wallets.wallet_name(fromUser)
+		toUser			= None if not Const.REQ_TO in data else data[Const.REQ_TO]
+		toUser			= toUser if not data['toUser'] else data['toUser']
+		toWallet		= data['toWallet'] if data['toWallet'] else eos_api.m_wallets.wallet_name(toUser)
+		Log.info("Transfer", data)
+		Log.info("Transfer", toUser, toWallet, fromUser, fromWallet)
+		
+		if not(fromUser):
+			msg = ErrorCodes.GENERAL_INVALID_USER
+			msg['message'] = "Transfer - Specify one of to, toUser or toWallet"
+			msg['data'] = data
+			msg['debug'] = list(set(data.keys()).intersection([Const.REQ_TO, 'toUser', 'toWallet']))
+			return DataUtil.verify_message(msg)
+		if not(toWallet):
+			msg = ErrorCodes.GENERAL_INVALID_USER
+			msg['message'] = "Transfer - Specify one of from, fromUser or fromWallet"
+			msg['data'] = data
+			msg['debug'] = list(set(data.keys()).intersection([Const.REQ_FROM, 'fromUser', 'fromWallet']))
+			return DataUtil.verify_message(msg)
+		
+
+		if not(get_jwt_identity() == fromUser or get_jwt_identity() == eos_api.m_issuer_wallet):
+			msg = ErrorCodes.GENERAL_INVALID_USER
+			msg['data'] = data
+			return DataUtil.verify_message(msg)
+		Log.info('Resources.Transfer', data)
+		result = eos_api.transfer(fromWallet, toWallet, data[Const.REQ_AMOUNT])
+		return result
+
+		
+class Publish(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data			= publish_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		if not(data["article-author"]):
+			data["article-author"] = data["writer"]
+		Log.info("Publish-Article", dict([(key, value[0:100]) for (key, value) in data.items()]))
+		Log.info('Publish-Data', str(data))
+		valid = get_jwt_identity() in [data[Const.REQ_WRITER], eos_api.m_issuer_wallet, "bywirewriter"]
+		valid = valid or data[Const.REQ_WRITER] in [eos_api.m_issuer_wallet, "bywirewriter"]
+
+		Log.info('Publish-Data', valid)
+		if not(valid):
+			Log.error("Publish - invalid permissions", get_jwt_identity(), data[Const.REQ_WRITER])
+			return DataUtil.verify_message(ErrorCodes.GENERAL_INVALID_USER)
+		if not(Const.REQ_ARTICLE_TITLE in data and Const.REQ_ARTICLE_CONTENT in data):
+			Log.error("Publish - Bad request this should not occur")
+			return ErrorCodes.PUBLISH_FAIL_UNKNOWN
+
+		article_id = data[Const.REQ_ARTICLE]
+		found	   = Article.getArticle(article_id)
+		article	   = Article.fromMessage(data)
+		Log.info("Publish - Found", found,  article.id)
+		if found:
+			Log.info("Publish - Changed", found[0].changed(article), found[0].ipfs_hash, found[0].id,  article.id)
+			if not(found[0].changed(article)):
+				Log.info("Publish - Duplicate Article")
+				article.delete()
+				msg = ErrorCodes.PUBLISH_FAIL_DUPLICATE_ARTICLE
+				msg["ipfs_hash"] = found[0].ipfs_hash
+				Log.info("Publish - msg", msg)
+				return DataUtil.verify_message(msg)
+		Log.info("Publishing", not(found))
+		article.flush()
+		msg = Publish.publish(article, new=not(found))
+		msg = DataUtil.verify_message(msg)
+		Log.info("Publish - msg", msg)
+		return msg
+	
+	@classmethod
+	def publish(cls, article, new=True):
+		from Main import ipfs_server
+		eos_api = BlockChain.Router.Router()
+		publisher = article["publisher"]
+		wallet	  = eos_api.m_wallets.wallet_name(publisher)
+		result = eos_api.allow_publish(wallet, new)
+		Log.info('Publish-Data', result)
+		if not(result):
+		       return ErrorCodes.PUBLISH_FAIL_INSUFFICIENT_FUNDS
+		       
+		result = ipfs_server.add(article)
+		if result is None or result['ipfs_hash'] == '':
+			Log.error('Publish - Error while storing article', result, article.toJSON() if article is not None else "")
+			return ErrorCodes.PUBLISH_FAIL_UNKNOWN
+		Log.info("Publish - IPFS HASH", result['ipfs_hash'], article.id)
+		article.ipfs_hash = result['ipfs_hash']
+		article.flush()
+		
+		from Main import trust_explorer
+		trust_explorer.add(article.ipfs_hash)
+		Log.info("Published Article", article.author, article.publisher, article.ipfs_hash)
+		Log.info("Published Article", result)
+		msg = eos_api.publish(article.author, article.publisher, article.ipfs_hash, new)
+		msg['ipfs_hash']	   = article.ipfs_hash
+		Log.info("*** Message ***", msg)
+		return msg
+		#return ErrorCodes.PUBLISH_FAIL_DUPLICATE_ARTICLE
+	
+
+class Account(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		from Main import fx_converter
+		eos_api			= BlockChain.Router.Router()
+		data			= account_info_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		Log.info("Account - Login - ", get_jwt_identity(), data[Const.REQ_NAME])
+		if not(get_jwt_identity() == data[Const.REQ_NAME] or get_jwt_identity() == eos_api.m_issuer_wallet):
+			return ErrorCodes.GENERAL_INVALID_USER
+		msg			= eos_api.account_info(data[Const.REQ_NAME])
+		if not 'amount' in msg:
+			return msg
+		pair			= ("WIRE", "GBP") if 'currency' not in data else ("WIRE", data['currency'] if data['currency'] else "GBP")
+		pair_gbp		= ("WIRE", "GBP")
+		pair_usd		= ("WIRE", "USD")
+		pair_eur		= ("WIRE", "EUR")
+		Log.info('Currency Pair', pair)
+		(bid, offer)		= fx_converter.convert(pair)
+		(bid_eur, offer_eur)	= fx_converter.convert(pair_eur)
+		(bid_usd, offer_usd)	= fx_converter.convert(pair_usd)
+		(bid_gbp, offer_gbp)	= fx_converter.convert(pair_gbp)
+		msg['pair']		= ' '.join(pair)
+		amount			= msg['amount']
+		msg['totalAmount']	= float(msg['amount'])
+		msg['liquidAmount']	= float(msg['amount']) - float(msg['staking'])
+		msg['amount']		= float(msg['amount']) - float(msg['staking'])
+		msg['bid']		= bid
+		msg['offer']		= offer
+		msg['buy_{0:s}'.format(pair[1].lower())]		= amount*offer
+		msg['sell_{0:s}'.format(pair[1].lower())]		= amount*bid
+		msg['amount_{0:s}'.format(pair[1].lower())]		= amount*bid
+		msg['amount_gbp']				= amount*bid_gbp
+		msg['amount_usd']				= amount*bid_usd
+		msg['amount_eur']				= amount*bid_eur
+		msg['notice']		= ErrorCodes.CURRENCY_CONVERT_SUCCESS['message']
+		return DataUtil.verify_message(msg)
+
+
+class FX(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		from Main import fx_converter
+		data			= currency_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		msg = ErrorCodes.FX_SUCCESS.copy()
+		if not('currency_pair' in data):
+			msg['data'] = fx_converter.rates()
+			return msg
+		pair = data['currency_pair'].split('/')
+		if len(pair) == 2:
+			msg['data'] = fx_converter.rates(pair)
+			return msg
+		else:
+			msg['data'] = fx_converter.rates()
+		return DataUtil.verify_message(msg)
+
+
+class Validate(Resource):
+	""" Logout a user based on access token """
+	def get(self):
+		from Main import validator, ipfs_server
+		data			= validate_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		# Check to fix missing certificates
+		Log.info("Validate", data)
+		article_id		= data[Const.REQ_ARTICLE]
+		article			= ipfs_server.get(article_id)
+		if (article and article.ipfs_hash == ""):
+			Log.info("Republishing")
+			Publish.publish(article, new=True)
+
+		if not(article):
+			return ErrorCodes.VALIDATE_ARTICLE_NOT_RECOGNIZED
+		msg = validator.validate(article.ipfs_hash)
+		Log.info("Validate - ", data, article.ipfs_hash, article)
+		Log.info("Validate - ", msg)
+		return DataUtil.verify_message(msg)
+
+class TransactionHistory(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		from Main import transaction_history
+		data			= transaction_history_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		Log.info("TransactionHistory", data)
+		username		= data['username']
+		page			= data['pageNR'] if 'pageNR' in data else None
+		page_size		= data['pageSize'] if 'pageSize' in data else None
+		return DataUtil.verify_message(transaction_history.history(username, page, page_size))
+
+class TransactionReport(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		from Main import transaction_history
+		data			= transaction_history_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		date			= data['date']	   if 'date'	 in data else None
+		page			= data['pageNR']   if 'pageNR'	 in data else None
+		page_size		= data['pageSize'] if 'pageSize' in data else None
+		return DataUtil.verify_message(transaction_history.report(date, page, page_size))
+
+class Currency(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		from Main import fx_converter
+		data			= currency_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		amount			= float(data['amount'])
+		
+		pair			= data['currency_pair'] if 'currency_pair' in data else "WIRE GBP"
+		pair			= pair.split(' ')
+		(bid, offer)	= fx_converter.convert(pair)
+		Log.info('Resources-convert', pair, bid, offer, amount, data)
+		msg			    = ErrorCodes.CURRENCY_CONVERT_SUCCESS.copy()
+		msg['pair']		= ' '.join(pair)
+		msg['amount']	= float(data['amount'])
+		msg['bid']		= bid
+		msg['offer']	= offer
+		msg['buy_qty']	= amount*bid
+		msg['sell_qty']	= amount*offer
+		msg['value']	= "{0:.6f} {1:s}".format(amount*bid, pair[1])
+		return DataUtil.verify_message(msg)
+
+
+class Certify(Resource):
+	""" Logout a user based on access token """
+	def get(self):
+		from Main import validator
+		data			= certify_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		article_id		= data["article_id"] if "article_id" in data else ""
+		article_ipfs_hash	= data["article_ipfs_hash"] if "article_ipfs_hash" in data else ""
+		return DataUtil.verify_message(validator.certify(article_id, article_ipfs_hash))
+
+
+
+class Stakes(Resource):
+	@jwt_required
+	def get(self):
+		data		   = publisher_report_parser.parse_args()
+		data		   = DataUtil.clean_data(data)
+		publisher	   = get_jwt_identity()
+		from Main import fx_converter
+		pair		     = "EOS USD"
+		pair		     = pair.split(' ')
+		(bid_usd, offer_usd)  = fx_converter.convert(pair)
+		pair		     = "EOS EUR"
+		pair		     = pair.split(' ')
+		(bid_eur, offer_eur)  = fx_converter.convert(pair)
+		pair		     = "EOS GBP"
+		pair		     = pair.split(' ')
+		(bid_gbp, offer_gbp)  = fx_converter.convert(pair)
+		stake		     = Stake.getStake(publisher)
+		eos_api		     = BlockChain.Router.Router()
+		wallet		     = eos_api.m_wallets.wallet_name(publisher)
+		msg		     = ErrorCodes.STAKES_SUCCESS.copy()
+		msg['username']	     = publisher
+		msg['wallet']	     = wallet
+		msg['eos']	     = stake.eos if stake.eos else 0.0
+		msg['eos_free']	     = stake.eos if stake.eos else 0.0
+		msg['eos_usd']	     = stake.eos*offer_usd if stake.eos else 0.0
+		msg['eos_eur']	     = stake.eos*offer_eur if stake.eos else 0.0
+		msg['eos_gbp']	     = stake.eos*offer_gbp if stake.eos else 0.0
+		msg['cpu']	     = stake.cpu if stake.cpu else 0.0
+		msg['net']	     = stake.net if stake.net else 0.0
+		return msg
+	
+	
+class PublisherStatsReport(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		data		   = publisher_report_parser.parse_args()
+		data		   = DataUtil.clean_data(data)
+		Log.info("PublisherStats", data)
+		publisher	   = get_jwt_identity()
+		if data["articles"]:
+			articles   = json.loads(data["articles"])
+			(totals, stats)	   = PublisherStats.getMatching(publisher, articles)
+		else:
+			page		   = int(data[Const.REQ_PAGE]) if data[Const.REQ_PAGE] else 0
+			page_size	   = int(data[Const.REQ_PAGE_SIZE]) if data[Const.REQ_PAGE_SIZE] else 11
+			(totals, stats)	   = PublisherStats.getTotalsForPublisher(publisher, page, page_size)
+		msg		     = ErrorCodes.PUBLISHER_REPORT_SUCCESS.copy()
+		msg['data']	     = [item.toJSON() for item in stats]
+		msg['count']	     = totals
+		msg['publisher']     = publisher
+		return msg
+
+class PublisherMonthlyReport(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		data		   = publisher_report_parser.parse_args()
+		data		   = DataUtil.clean_data(data)
+		publisher	   = get_jwt_identity()
+		eos_api		   = BlockChain.Router.Router()
+		wallet		   = eos_api.m_wallets.wallet_name(publisher)
+		balance		   = Balance.get(wallet, eos_api.m_eos_token)
+		Log.info("PublisherReport", balance)
+		stats		   = PublisherReport.getTotals(publisher)
+		stats_today	   = dict([(key, 0.0) for key in ['publish_nr', 'publish_amount', 'read_nr', 'read_amount', 'tip_nr', 'tip_amount']])
+		report		   = {"month": {}, "week": {}, "day": {}}
+		now		   = datetime.now()
+		dates		   = []
+		msg		     = ErrorCodes.PUBLISHER_REPORT_SUCCESS.copy()
+		msg['data']	     = {"month": {}, "week": {}, "day": {}}
+		msg['balance']	     = balance.total
+		msg['processing']    = balance.processing
+		msg['on_blockchain'] = balance.blockchain
+
+		if not len(stats):
+			return msg
+
+		record		   = stats[0].toJSON()
+		total		   = dict([(key, 0) for (key, value) in record.items()])
+		
+		for i in reversed(range(0, 13)):
+			month = (now.month - i + 12 - 1)%12 + 1
+			year  = now.year - 1 if (now.month - i) <= 0 else now.year
+			month = datetime(year, month, 1).strftime("%b-%Y")
+			report["month"][month]		   = dict([(key, 0) for (key, value) in record.items()])
+			report["month"][month]['date']	   = month
+			report["month"][month]['publisher'] = publisher
+
+		for i in reversed(range(0, 7)):
+			week  = (now - timedelta(days=i)).strftime("%a-%Y%m%d")
+			report["week"][week]		   = dict([(key, 0) for (key, value) in record.items()])
+			report["week"][week]['date']	   = week
+			report["week"][week]['publisher']  = publisher
+
+		for i in reversed(range(0, now.day)):
+			day  = (now - timedelta(days=i)).strftime("%d-%Y%m%d")
+			report["day"][day]		   = dict([(key, 0) for (key, value) in record.items()])
+			report["day"][day]['date']	   = day
+			report["day"][day]['publisher']	   = publisher
+
+
+			
+		for item in stats:
+			record = item.toJSON()
+			date   = datetime.strptime(record["date"], "%Y-%m-%d")
+			month  = date.strftime("%b-%Y")
+			week   = date.strftime("%a-%Y%m%d")
+			day    = date.strftime("%d-%Y%m%d")
+
+			for key in record.keys():
+				if key in ("date", "publisher"):
+					continue
+				if (month in report["month"]):
+					report["month"][month][key] += record[key]
+				if (week in report["week"]):
+					report["week"][week][key] += record[key]
+				if (day in report["day"]):
+					report["day"][day][key] += record[key]
+				total[key]	   += record[key]
+		Log.info(report)
+		msg['data']	     = report
+		msg['data_today']    = stats_today
+		for key in ['publish_nr', 'publish_amount', 'read_nr', 'read_amount', 'tip_nr', 'tip_amount']:
+			msg[key]     = total[key]
+		today			     = datetime.now().strftime("%d-%Y%m%d")
+		msg['today_read_nr']	     = report["day"][today]["read_nr"]
+		msg['today_read_amount']     = report["day"][today]["read_amount"]
+		read_today		     = ReadDB.readToday(limit=1)
+		title			     = Article.getArticleByHASH(read_today[0])
+		title			     = title[0].title if title else read_today[0]
+		msg['today_article_title']   = title
+		msg['today_article_nr']	     = read_today[1]
+		msg['publisher']     = publisher
+						     
+
+		return msg
+
+class AccountReport(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		data		   = account_report_parser.parse_args()
+		data		   = DataUtil.clean_data(data)
+		publisher	   = get_jwt_identity()
+		page		   = int(data["page"])	     if data["page"]	   else 0
+		nr_results	   = int(data["nr_results"]) if data["nr_results"] else 10
+		stats		   = User.getAccountsForParent(publisher, page, nr_results)
+		msg		   = ErrorCodes.ACCOUNT_REPORT_SUCCESS.copy()
+		msg['data']	   = stats
+		return msg
+
+
+	
+class Trustability(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def get(self):
+		from Main import trust_explorer
+		data			= validate_parser.parse_args()
+		data			= DataUtil.clean_data(data)
+		
+		return DataUtil.verify_message(trust_explorer.certify(data[Const.REQ_ARTICLE]))
+
+
+class Fee(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		data				= fee_parser.parse_args()
+		if not(get_jwt_identity() == eos_api.m_issuer_wallet):
+			return ErrorCodes.GENERAL_INVALID_USER
+		read_rate			= data[Const.REQ_READ_RATE]		if Const.REQ_READ_RATE in data		else ""
+		tip_rate			= data[Const.REQ_TIP_RATE]			if Const.REQ_TIP_RATE in data		else ""
+		transfer_rate		= data[Const.REQ_TRANSFER_RATE]		if Const.REQ_TRANSFER_RATE in data	else ""
+		writer_rate			= data[Const.REQ_WRITER_RATE]		if Const.REQ_WRITER_RATE in data	else ""
+		publisher_rate		= data[Const.REQ_PUBLISHER_RATE]	if Const.REQ_PUBLISHER_RATE in data else ""
+		Log.info('RATES', read_rate, tip_rate, transfer_rate, writer_rate, publisher_rate)
+		has_read_rate		= re.match('0[.][0-9]+', read_rate if read_rate else "") is not None
+		has_tip_rate		= re.match('0[.][0-9]+', tip_rate if tip_rate else "")	is not None
+		has_transfer_rate   = re.match('0[.][0-9]+', transfer_rate if transfer_rate else "") is not None
+		has_writer_rate		= re.match('0[.][0-9]+', writer_rate if writer_rate else "") is not None
+		has_publisher_rate  = re.match('0[.][0-9]+', publisher_rate if publisher_rate else "") is not None
+		Log.info('HASRATES', has_read_rate, has_tip_rate)
+		if (has_read_rate and (sum([has_read_rate, has_tip_rate, has_transfer_rate, has_writer_rate, has_publisher_rate])==1)):
+			return DataUtil.verify_message(eos_api.set_read_fee(read_rate))
+		elif (has_tip_rate and (sum([has_read_rate, has_tip_rate, has_transfer_rate, has_writer_rate, has_publisher_rate])==1)):
+			return DataUtil.verify_message(eos_api.set_tip_fee(tip_rate))
+		elif (has_transfer_rate and (sum([has_read_rate, has_tip_rate, has_transfer_rate, has_writer_rate, has_publisher_rate])==1)):
+			return DataUtil.verify_message(eos_api.set_transfer_fee(transfer_rate))
+		elif (has_writer_rate and (sum([has_read_rate, has_tip_rate, has_transfer_rate, has_writer_rate, has_publisher_rate])==1)):
+			return DataUtil.verify_message(eos_api.set_publish_rate(writer_rate, publisher_rate))
+		elif (has_writer_rate and has_publisher_rate and (sum([has_read_rate, has_tip_rate, has_transfer_rate, has_writer_rate, has_publisher_rate])==2)):
+			return DataUtil.verify_message(eos_api.set_publish_rate(writer_rate, publisher_rate))
+		else:
+			msg =ErrorCodes.FEE_IMPROPER_PACING
+			msg['rates'] = [read_rate, tip_rate, transfer_rate, writer_rate, publisher_rate]
+			msg['tests']= [has_read_rate, has_tip_rate, has_transfer_rate, has_writer_rate, has_publisher_rate]
+			msg['data'] = data
+			return DataUtil.verify_message(msg)
+
+
+class UserLogoutAccess(Resource):
+	""" Logout a user based on access token """
+	@jwt_required
+	def post(self):
+		jti = get_raw_jwt()['jti']
+		try:
+			revoked_token = RevokedToken(jti = jti)
+			revoked_token.flush()
+			return ErrorCodes.LOGOUT_SUCCESS
+		except:
+			return ErrorCodes.LOGOUT_FAIL
+
+
+class UserLogoutRefresh(Resource):
+	""" Logout user using refresh token """
+	@jwt_refresh_token_required
+	def post(self):
+		jti = get_raw_jwt()['jti']
+		try:
+			revoked_token = RevokedToken(jti = jti)
+			revoked_token.flush()
+			return ErrorCodes.LOGOUT_SUCCESS
+		except:
+			return ErrorCodes.LOGOUT_FAIL		
+
+
+class BrewCoffee(Resource):
+	""" Logout user using refresh token """
+	@jwt_required
+	def post(self):
+		return Response("I'm a teapot", status=418, mimetype='application/coffee-pot-command')
+
+			
+class TokenRefresh(Resource):
+	""" Obtain a new access token
+	"""
+	
+	@jwt_refresh_token_required
+	def post(self):
+		current_user	    = get_jwt_identity()
+		Log.info(current_user)
+		access_token	    = create_access_token(identity = current_user)
+		msg		    = ErrorCodes.TOKEN_REFRESH_SUCCESS
+		msg['access_token'] = access_token
+		return msg
+
+
+class Heartbeat(Resource):
+	""" Logout a user based on access token """
+	def post(self):
+		eos_api			= BlockChain.Router.Router()
+		eos_api.heartbeat()
+		return ErrorCodes.HEARTBEAT_SUCCESS
+		
