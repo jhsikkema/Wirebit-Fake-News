@@ -1,25 +1,34 @@
 import requests
 import pymongo
+import json
+import time
 
 client	 = pymongo.MongoClient("mongodb://localhost:27017/")
 db	 = client["bywire"]
 articles = db["articles"]
-analyzer = "localhost:5055"
+analyzer = "http://127.0.0.1:5055"
 routes	 = {'text':  analyzer+'/analyze/text',
-	    'query': analyzer+'/analyze/query',
+	    'query': analyzer+'/analyze/query'}
 
-for item in articles.find():
-	print(item)
-	print(routes['text']
-	exit(1)
-	request = requests.post(routes['text'], json=item)
-	print(request)
-	print(request.status_code)
-	for i in range(100000):
-		request = requests.post(routes['query'], json=item)
-		print(request)
-		time.sleep(1)
-
+for (i, item) in enumerate(articles.find()):
+	if i < 258000:
+		continue
+	print(i)
+	if i%1000 == 0:
+		time.sleep(8)
+	record = {'content':   item['content'],
+		  'title':     item['title'],
+		  'platform':  "bywire",
+		  'author':    item['author'] if 'author' in item else "",
+		  'publisher': item['publisher'] if 'publisher' in item else ""}
+	for (key, value) in record.items():
+		record[key] = record[key] if record[key] else ""
+	request = requests.post(routes['text'], params=record)
+	response = json.loads(request.text)
+	print(response)
+	id = response["id"]
+	if response["new"]:
+		time.sleep(0.01)
 
 
 

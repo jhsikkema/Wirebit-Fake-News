@@ -5,6 +5,7 @@ from ming import schema
 from ming.odm import MappedClass
 from ming.odm import FieldProperty, ForeignIdProperty
 from Database.Database import Database
+from Database.Request import Request
 import pymongo
 import hashlib
 from datetime import datetime
@@ -24,7 +25,6 @@ class Article(MappedClass):
 	publisher		= FieldProperty(schema.String)
 	platform		= FieldProperty(schema.String)
 	title			= FieldProperty(schema.String)
-	has_senntiment		= FieldProperty(schema.Boolean)
 	content			= FieldProperty(schema.String(required=True))
 	content_hash		= FieldProperty(schema.String)
 	timestamp		= FieldProperty(schema.DateTime)
@@ -41,7 +41,6 @@ class Article(MappedClass):
 			  "title":		  self.title,
 			  "content":		  self.content,
 			  "content_hash":	  self.content_hash,
-			  "ipfs_hash":		  self.ipfs_hash,
 			  "timestamp":		  self.timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
 		}
 		return record
@@ -49,6 +48,20 @@ class Article(MappedClass):
 	def __str__(self):
 		return str(self.toJSON())
 
+
+	@classmethod
+	def all(cls):
+		return cls.query.find({}).all()
+
+	"""
+	@classmethod
+	def requeue(cls):
+		for item in cls.query.find({}).all():
+			request = Request.fromJSON(item.toJSON())
+			request.flush()
+	
+	"""
+	
 	@staticmethod
 	def genID(content_hash, ipfs_hash):
 		return content_hash if not(ipfs_hash) else "IPFS_"+ipfs_hash
@@ -65,17 +78,16 @@ class Article(MappedClass):
 			record["content_hash"] = Article.contentHash(record)
 		if not("ipfs_hash" in record):
 			record["ipfs_hash"] = ""
-                if not("id" in record):
-                        record["id"] = Article.genID(record["content_hash"], record["ipfs_hash"])
+		if not("id" in record):
+			record["id"] = Article.genID(record["content_hash"], record["ipfs_hash"])
 		return Article(id	     = record["id"],
 			       author	     = record["author"],
 			       publisher     = record["publisher"],
 			       platform	     = record["platform"],
 			       title	     = record["title"],
 			       content	     = record["content"],
-			       timestamp     = record["timestamp"],
 			       content_hash  = record["content_hash"],
-			       ipfs_hash     = record["ipfs_hash"],
+			       timestamp     = record["timestamp"]
 		)
 
 	@staticmethod
@@ -84,7 +96,7 @@ class Article(MappedClass):
 		return str(hashlib.sha512(bytes(content, 'utf-8')).hexdigest().encode('ascii'))
 
 	@classmethod
-	def getArticle(cls, id):
+	def get(cls, id):
 		return cls.query.find({'id': id}).first()
 
 	@classmethod
@@ -92,12 +104,13 @@ class Article(MappedClass):
 		data	 = message
 		timestamp=datetime.now()
 		record = {"id":		     data[Const.REQ_ARTICLE],
-			  "content":	     data[Const.REQ_ARTICLE_CONTENT] if Const.REQ_ARTICLE_CONTENT in data else "",
-			  "timestamp":	     timestamp,
-			  "title":	     data[Const.REQ_ARTICLE_TITLE],
 			  "author":	     data[Const.REQ_ARTICLE_AUTHOR],
+			  "platform":	     data["platform"],
 			  "publisher":	     data["publisher"],
-			  "platform":	     data["platform"]}
+			  "title":	     data[Const.REQ_ARTICLE_TITLE],
+			  "content":	     data[Const.REQ_ARTICLE_CONTENT],
+			  "timestamp":	     timestamp
+		}
 		article = cls.fromJSON(record)
 		return article
 

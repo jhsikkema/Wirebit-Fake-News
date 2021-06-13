@@ -22,7 +22,7 @@ class Request(MappedClass):
 	
 	id			= FieldProperty(schema.String(required=True))
 	timestamp		= FieldProperty(schema.DateTime)
-	processing		= FieldProperty(schema.Boolean)
+	processing		= FieldProperty(schema.Bool)
 
 	def toJSON(self):
 		record = {"id":			  self.id,
@@ -39,7 +39,7 @@ class Request(MappedClass):
 		timestamp = record["timestamp"]
 		if isinstance(timestamp, str):
 			timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
-
+		record["processing"] = record["processing"] if "processing" in record else False
 		return Request(	 id	   = record["id"],
 				 timestamp   = timestamp,
 				 processing  = record["processing"]
@@ -48,4 +48,11 @@ class Request(MappedClass):
 
 	@classmethod
 	def getQueue(cls):
-		return deque(cls.query.find({'processing': False}).order({"timestamp": pymongo.ASCENDING}).all())
+		return deque([item for item in cls.query.find({'processing': False}).sort([["timestamp",  pymongo.ASCENDING]]).limit(100)])
+
+
+	@classmethod
+	def flush(cls):
+		db = Database.getInstance()
+		db.flush()
+

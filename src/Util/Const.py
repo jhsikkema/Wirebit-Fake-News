@@ -23,7 +23,10 @@ class Const(object):
 	STORAGE_STAKES_FILE			= ('storage', 'stakes', 'file')
 	STORAGE_CLEOS_PATH			= ('storage', 'cleos', 'path')
 	STORAGE_KEYS_COPY_CMD			= ('storage', 'keys', 'copy-cmd')
-	
+
+	EXPERTAI_USE				= ('api', 'expertai', 'use')
+	EXPERTAI_USERNAME			= ('api', 'expertai', 'username')
+	EXPERTAI_PASSWORD			= ('api', 'expertai', 'password')
 	
 	EOS_METHOD				= ('eos', 'method')
 	EOS_URL					= ('eos', 'url')

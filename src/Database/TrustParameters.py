@@ -21,16 +21,24 @@ class TrustParameters(MappedClass):
 	version			= FieldProperty(schema.Int)
 	platform		= FieldProperty(schema.String)
 	publisher		= FieldProperty(schema.String)
-	sentiment_score_ci	= FieldProperty(schema.Float)
-	lexical_complexity_ci	= FieldProperty(schema.Float)
+	sentiment_score_cutoff	= FieldProperty(schema.Float)
+	sentiment_score_scale	= FieldProperty(schema.Float)
+	article_length_cutoff	= FieldProperty(schema.Float)
+	article_length_scale	= FieldProperty(schema.Float)
+	complexity_punctuation_cutoff	= FieldProperty(schema.Float)
+	complexity_punctuation_scale	= FieldProperty(schema.Float)
 
 	def toJSON(self):
-		record = {"version":		   self.version,
-			  "platform":		   self.platform,
-			  "publisher":		   self.publisher,
-			  "sentiment_score_ci":	   self.sentiment_score_ci,
-			  "lexical_complexity_ci": self.lexical_complexity_ci
-			  }
+		record = {"version":		    self.version,
+			  "platform":		    self.platform,
+			  "publisher":		    self.publisher,
+			  "sentiment_score_cutoff": self.sentiment_score_cutoff,
+			  "sentiment_score_cutoff": self.sentiment_score_scale,
+			  "article_length_cutoff":  self.article_length_cutoff,
+			  "article_length_scale":   self.article_length_scale,
+			  "complexity_punctuation_cutoff":  self.complexity_punctuation_cutoff,
+			  "complexity_punctuation_scale":   self.complexity_punctuation_scale
+		}
 		return record
 
 	def __str__(self):
@@ -38,17 +46,26 @@ class TrustParameters(MappedClass):
 	
 	@classmethod
 	def fromJSON(self, record):
-		return TrustArticle(version		   = record["version"],
-				    platform		   = record["platform"],
-				    publisher		   = record["publisher"],
-				    sentiment_score_ci	   = record["sentiment_score_ci"],
-				    lexical_complexity_ci   = record["lexical_complexity_ci"]
+		return TrustParameters(version		   = record["version"],
+				       platform		   = record["platform"],
+				       publisher		   = record["publisher"],
+				       sentiment_score_cutoff = record["sentiment_score_cutoff"],
+				       sentiment_score_scale  = record["sentiment_score_scale"],
+				       article_length_cutoff  = record["article_length_cutoff"],
+				       article_length_scale   = record["article_length_scale"],
+				       complexity_punctuation_cutoff  = record["complexity_punctuation_cutoff"],
+				       complexity_punctuation_scale   = record["complexity_punctuation_scale"]
 				    )
 
 	@classmethod
+	def clean(cls):
+		version = cls.getVersion()
+		cls.query.remove({"version": {"$lt": version}})
+		
+	@classmethod
 	def getVersion(cls):
-		record = cls.query.find().order({"version": pymongo.DESCENDING}).first()
-		return record["version"]
+		record = cls.query.find().sort([["version", pymongo.DESCENDING]]).first()
+		return record["version"] if record else 0
 		
 	
 	@classmethod

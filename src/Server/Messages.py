@@ -1,7 +1,7 @@
 import os, os.path
 
 class Messages(object):
-        SUCCESS         = {'success': True}
+	SUCCESS		= {'success': True}
 	LOGIN_FAIL_USER_NOT_DEFINED	= {'code': 'LOGIN_FAIL_USER_NOT_DEFINED', 'message': 'User does not exists', 'success': False}
 	LOGIN_FAIL_INVALID_CREDENTIALS	= {'code': 'LOGIN_FAIL_INVALID_CREDENTIALS', 'message': 'Invalid Credentials', 'success': False}
 	LOGIN_SUCCESS			= {'code': 'LOGIN_SUCCESS', 'message': 'Logged in as {0:s}', 'access_token': '', 'refresh_token': '', 'success': True}

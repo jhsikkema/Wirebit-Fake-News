@@ -9,9 +9,9 @@ import threading
 import re
 import codecs
 import signal
+import cProfile
 
-from IPFS.IPFSServer import IPFSServer
-from IPFS.IPFSConst import IPFSConst
+from Server.Analyzer import Analyzer
 from Util.Const import Const
 from Util.Config import Config
 from Util.Log import Log
@@ -20,7 +20,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-global ipfs_server, config, PARAMETER_VERSION
+global config, analyzer, PARAMETER_VERSION
 
 
 app = Flask(__name__)
@@ -44,9 +44,6 @@ def index():
 config = Config(Const.CONFIG_PATH)
 config.__enter__()
 log = Log(config)
-Log.info(config[IPFSConst.CONFIG_READ_ONLY_SERVER], IPFSConst.CONFIG_READ_ONLY_SERVER)
-ipfs_server = IPFSServer(config, config[IPFSConst.CONFIG_READ_ONLY_SERVER].lower() == 'false')
-ipfs_server.start()
 analyzer = Analyzer.get(config)
 analyzer.start()
 #api.add_resource(Resources.UserRegistration,		'/registration')
@@ -56,7 +53,10 @@ analyzer.start()
 #api.add_resource(Resources.TokenRefresh,		'/token/refresh')
 #api.add_resource(Resources.GenerateKeys,		'/generatekeys')
 
-api.add_resource(Resources.CalculateParameters,		'/parameters/calculate')
+api.add_resource(Resources.CalibrateParameters,		'/parameters/calibrate')
+api.add_resource(Resources.CleanParameters,		'/parameters/clean')
+api.add_resource(Resources.RecalculateParameters,	'/parameters/recalculate')
+api.add_resource(Resources.AnalyzeFlag,			'/analyze/flag')
 api.add_resource(Resources.AnalyzeText,			'/analyze/text')
 api.add_resource(Resources.AnalyzeIPFS,			'/analyze/ipfs')
 api.add_resource(Resources.AnalyzeQuery,		'/analyze/query')
@@ -64,13 +64,15 @@ api.add_resource(Resources.AnalyzeQuery,		'/analyze/query')
 @app.teardown_appcontext
 def shutdown_session(exception=None):
 	if exception:
-		global wallets, config, beat, ipfs_server, trust_explorer
+		global config, analyzer
 		db_session.remove()
 		analyzer.stop()
-		ipfs_server.stop()
 		config.__exit__(None, None, None)
 		
 
 if __name__=='__main__':
 	print("Running Main")
-	cProfile.run("app.run(host='127.0.0.1', port='5030')", "profile.prof")
+	cProfile.run("app.run(host='127.0.0.1', port='5055')", "profile.prof")
+
+
+	
