@@ -23,21 +23,25 @@ class Trust(MappedClass):
 	id			= FieldProperty(schema.String(required=True))
 	param_version		= FieldProperty(schema.Int)
 	trust_score		= FieldProperty(schema.Float)
+	inconsistency_score	= FieldProperty(schema.Float)
 	sentiment_score		= FieldProperty(schema.Float)
 	layout_score		= FieldProperty(schema.Float)
 	complexity_score	= FieldProperty(schema.Float)
 	platform_score		= FieldProperty(schema.Float)
 	author_score		= FieldProperty(schema.Float)
+	reasons			= FieldProperty(schema.String)
 
 	def toJSON(self):
 		record = {"id":			  self.id,
 			  "param_version":	  self.param_version,
-			  "score":		  self.score,
+			  "trust_score":	  self.trust_score,
 			  "sentiment_score":	  self.sentiment_score,
+			  "inconsistency_score":  self.inconsistency_score,
 			  "layout_score":	  self.layout_score,
 			  "complexity_score":	  self.complexity_score,
 			  "platform_score":	  self.platform_score,
-			  "author_score":	  self.author_score
+			  "author_score":	  self.author_score,
+			  "reasons":		  self.reasons,
 			  }
 		return record
 
@@ -50,10 +54,12 @@ class Trust(MappedClass):
 			     param_version	   = record["param_version"],
 			     score		   = record["score"],
 			     sentiment_score	   = record["sentiment_score"],
+			     inconsistency_score   = record["inconsistency_score"],
 			     layout_score	   = record["layout_score"],
 			     complexity_score	   = record["complexity_score"],
 			     platform_score	   = record["platform_score"],
-			     author_score	   = record["author_score"]
+			     author_score	   = record["author_score"],
+			     reasons		   = record["reasons"]
 		)
 
 

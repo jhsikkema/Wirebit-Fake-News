@@ -52,6 +52,12 @@ class Request(MappedClass):
 
 
 	@classmethod
+	def get(cls, id):
+		return cls.query.find({"id": id}).first()
+
+	
+
+	@classmethod
 	def flush(cls):
 		db = Database.getInstance()
 		db.flush()
