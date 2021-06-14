@@ -53,7 +53,7 @@ class AnalyzeQuery(Resource):
 			return {"status": "Processing", "done": False}, 200
 		trust	= Trust.get(id)
 		if not(trust):
-			return {"status": "Unknown Request", "done": False}, 200
+			return {"status": "Unknown Request", "done": True}, 200
 		msg = {"status": "Done", "done": True, "data": trust.toJSON()}
 		print(msg)
 		return msg, 200
