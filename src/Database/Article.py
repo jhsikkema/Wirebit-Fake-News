@@ -51,8 +51,46 @@ class Article(MappedClass):
 
 	@classmethod
 	def all(cls):
-		return cls.query.find({}).all()
-
+		#Alternative implementation as ming is very slow to loop over a collection
+		client	     = pymongo.MongoClient("mongodb://localhost:27017/")
+		db	     = client["bywire_trust"]
+		articles     = db["articles"]		     
+		for item in articles.find().sort([["id", pymongo.ASCENDING]]):
+			yield item
+			
+	@classmethod
+	def new_requests(cls):
+		#Alternative implementation as ming is very slow to loop over a collection
+		client	     = pymongo.MongoClient("mongodb://localhost:27017/")
+		db	     = client["bywire_trust"]
+		#db	     = client[Database.__INSTANCE.m_schema]
+		trust	     = db["trust_articles"]		     
+		request	     = db["request"]		     
+		articles     = db["articles"]		     
+		for item in articles.find().sort([["id", pymongo.ASCENDING]]):
+			if (trust.find({"id": item["id"]}).count()>0):
+				continue
+			yield item
+			
+	@classmethod
+	def requeue(cls):
+		#Alternative implementation as ming is very slow to loop over a collection
+		client	     = pymongo.MongoClient("mongodb://localhost:27017/")
+		db	     = client["bywire_trust"]
+		trust	     = db["trust_articles"]		     
+		request	     = db["request"]		     
+		articles     = db["articles"]		     
+		for (i, item) in enumerate(articles.find().sort([["id", pymongo.ASCENDING]])):
+			if (request.find({"id": item["id"]}).count() > 0):
+				continue
+			if (trust.find({"id": item["id"]}).count()>0):
+				continue
+			new_request = Request.fromJSON({"id": item["id"]})
+			new_request.flush()
+			if (i % 1000 == 0):
+				print(i)
+		print("Requeue Done")
+			
 	"""
 	@classmethod
 	def requeue(cls):

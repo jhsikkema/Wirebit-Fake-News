@@ -11,6 +11,8 @@ from collections import deque
 from datetime import datetime, timedelta
 import argparse
 import math
+import traceback
+
 from nrclex import NRCLex
 from nltk import corpus, tokenize, stem
 from IPFS.ipfs import IPFSGateway
@@ -24,16 +26,19 @@ from Database.TrustArticle    import TrustArticle
 from Database.TrustParameters import TrustParameters
 from Database.Database import Database
 
-from expertai.nlapi.cloud.client import ExpertAiClient
+# Import according to the docs didn't work on our server
+#from expertai.client import ExpertAiClient
+from expertai.nlapi.common.errors import ExpertAiRequestError as ExpertAiRequestError
 
 class Analyzer(threading.Thread):
+	""" Analyzer: Core class to calculate trust scores 
+	"""
 	INSTANCE = None
 	def __init__(self, config):
 		super(Analyzer, self).__init__()
 		self.m_config		      = config
 		self.m_run		      = False
 		self.m_queue		      = deque()
-		self.m_db_locked	      = False
 		self.m_parameters	      = [item for item in TrustParameters.get(TrustParameters.getVersion())]
 		print("PARAMETERS")
 		print(self.m_parameters)
@@ -56,9 +61,6 @@ class Analyzer(threading.Thread):
 				
 	def run(self):
 		while self.m_run:
-			if self.m_db_locked:
-				time.sleep(1)
-				continue
 			queue = Request.getQueue()
 			for item in queue:
 				result = self.analyze(item)
@@ -67,7 +69,36 @@ class Analyzer(threading.Thread):
 					Request.flush()
 			time.sleep(1)
 
+	def send_to_api(self, text, language, resource):
+		try:
+			document = client.specific_resource_analysis(
+				body={"document": {"text": text}}, 
+				params={'language': language, 'resource': resource})
 
+		except ExpertAiRequestError as e:
+			if e.text.startswith("Failed to fetch the Bearer Token"):
+				print("Invalid ExpertAi password. Please reconfigure Config/Config.xml")
+				exit(0)
+			else:
+				raise
+		return document
+			
+
+	def enrich(self, text):
+		sentiment_output   = self.send_to_api(text, 'en', 'sentiment')
+		complexity_output  = self.send_to_api(text, 'en', 'deep-linguistic-analysis')
+		try:
+			
+			record = {"sentiment_expertai_postive":	 sentiment_output.sentiment.postive,
+				  "sentiment_expertai_negative": sentiment_output.sentiment.negative,
+				  "complexity_expertai": 0.0}
+		except AttributeError as e:
+			traceback.print_tb()
+			
+
+		return record
+			
+		
 	def complexity(self, text):
 		tokens = tokenize.word_tokenize(text)
 		tokens = [token.lower() for token in tokens if not(token in (".", ","))]
@@ -93,7 +124,7 @@ class Analyzer(threading.Thread):
 		if not(article):
 			Log.error("ERROR *** Article not found")
 			return False
-		text_object = NRCLex(article.content)
+		text_object		     = NRCLex(article.content)
 		sentiment		     = text_object.affect_frequencies
 		complexity		     = self.complexity(article.content)
 		
@@ -139,19 +170,13 @@ class Analyzer(threading.Thread):
 		
 	
 	def clean(self):
+		""" Frees up space from old algorithms
+		"""
 		Trust.clean()
 
 	def calibrate(self):
-		self.m_db_locked = True
-		for (i, item) in enumerate(Article.all()):
-			trust	= TrustArticle.get(item["id"])
-			if not(trust):
-				request = Request.fromJSON(item.toJSON())
-				request.flush()
-			if (i % 1000 == 0):
-				print(i)
-		self.m_db_locked = False
-				
+		Article.requeue()
+		
 		version		= TrustParameters.getVersion()+1
 		factor		= ["sentiment_score", "article_length"]
 		ci_sentiment	= TrustArticle.ci("sentiment_score")
@@ -172,30 +197,14 @@ class Analyzer(threading.Thread):
 		print(record)
 		parameters = TrustParameters.fromJSON(record)
 		parameters.flush()
-		self.m_db_locked = True
 		for (i, item) in enumerate(Article.all()):
-			trust	= TrustArticle.get(item["id"])
-			if not(trust):
-				request = Request.fromJSON(item.toJSON())
-			request.flush()
-			self.score(item.toJSON())
+			self.score(item)
 			if (i % 1000 == 0):
 				print(i)
-				time.sleep(15)
-		self.m_db_locked = False
 		
 	def recalculate(self):
 		TrustArticle.clean()
-		self.m_db_locked = True
-		for (i, item) in enumerate(Article.all()):
-			request = Request.fromJSON(item.toJSON())
-			request.flush()
-			if (i % 1000 == 0):
-				print(i)
-				time.sleep(15)
-		self.m_db_locked = False
-	
-		#Article.requeue()
+		Article.requeue()
 		
 	def download(self, request):
 		pass

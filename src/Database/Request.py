@@ -36,7 +36,7 @@ class Request(MappedClass):
 	
 	@classmethod
 	def fromJSON(cls, record):
-		timestamp = record["timestamp"]
+		timestamp = record["timestamp"] if "timestamp" in record else datetime.now()
 		if isinstance(timestamp, str):
 			timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
 		record["processing"] = record["processing"] if "processing" in record else False

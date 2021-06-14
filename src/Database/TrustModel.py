@@ -9,8 +9,8 @@ import pymongo
 from datetime import datetime
 import json
 
-class TrustParameters(MappedClass):
-	""" Maps Features of an article to the range [0-1] to allow better learning """
+class TrustModel(MappedClass):
+	""" ANN model Raw Features of an article """
 	class __mongometa__:
 		session = Database.getInstance()
 		name = 'trust_parameters'
