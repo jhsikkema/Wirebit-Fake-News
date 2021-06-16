@@ -37,27 +37,35 @@ class AnalyzeIPFS(Resource):
 	def post(self):
 		data	= analyze_ipfs_parser.parse_args()
 		data	= DataUtil.clean_data(data)
-		record["id"] = Article.genID("", data["ipfs_hash"])
-		if (Article.get(record["id"])):
+		Log.info(data)
+		record	= {}
+		id	     = Article.genID("", data["ipfs_hash"])
+		if (Article.get(id)):
 			return {"id": id, "new": True}, 200
+		record["id"] = id
 		request = Request.fromJSON(record)
 		request.flush()
-		return {"id": request.id, "new": True}, 200
+		return {"id": id, "new": True}, 200
 
 class AnalyzeQuery(Resource):
 	def post(self):
 		data	= analyze_query_parser.parse_args()
 		data	= DataUtil.clean_data(data)
-		id	= data["id"]
+		Log.info("AnalyzeQuery", data)
+		id	= re.sub("\\\\", "", data["id"])
+		Log.info("AnalyzeQuery", id)
 		if (Request.get(id)):
+			Log.info("AnalyzeQuery - Got Query")
 			return {"id": id, "status": "Processing", "done": False}, 200
 		trust	= Trust.get(id)
 		if not(trust):
+			Log.info("AnalyzeQuery - Got Trust")
 			return {"id": id, "status": "Unknown Request", "done": True}, 200
 		msg = {"id": id, "status": "Done", "done": True, "data": trust.toJSON()}
 		if (request.fromIPFS):
 			article = Article.get(id)
 			msg["text"] = article.content
+		Log.info("AnalyzeQuery - DONE", msg)
 		return msg, 200
 
 class AnalyzeFlag(Resource):

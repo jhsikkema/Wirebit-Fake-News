@@ -67,18 +67,15 @@ class Analyzer(threading.Thread):
 			for request in queue:
 				request.processing = True
 				article = Article.get(request.id)
-				remove = True
 				if not(article):
 					if (request.fromIPFS()):
 						self.download(request)
-						remove = False
 					else:
 						Log.error("ERROR *** Article not found")
 				else:
 					result = self.analyze(article)
-				if (remove):
-					request.delete()
-					Request.flush()
+				request.delete()
+				Request.flush()
 			time.sleep(1)
 
 	def send_to_api(self, text, language, resource):
@@ -153,12 +150,13 @@ class Analyzer(threading.Thread):
 		return True
 
 	def score(self, record):
+		Log.info("Scoring")
 		if not(self.m_parameters):
 			return
-		a1 = self.m_parameters.article_length_cutoff
-		b1 = self.m_parameters.article_length_scale
-		a2 = self.m_parameters.sentiment_score_cutoff
-		b2 = self.m_parameters.sentiment_score_scale
+		a1 = self.m_parameters.article_length["ci10"]
+		b1 = self.m_parameters.article_length["scale"]
+		a2 = self.m_parameters.sentiment_score["ci90"]
+		b2 = self.m_parameters.sentiment_score["scale"]
 		y1 = max(0, 1-b1*(record["article_length"]-a1))
 		c2 = math.exp(-a2 - b2*record["sentiment_score2"])
 		y2 = 1/(1+c2)
@@ -187,25 +185,15 @@ class Analyzer(threading.Thread):
 		Article.requeue()
 		
 		version		= TrustParameters.getVersion()+1
-		factor		= ["sentiment_score", "article_length"]
-		ci_sentiment	= TrustArticle.ci("sentiment_score")
-		ci_length	= TrustArticle.ci("article_length")
-		ci_punctuation	= TrustArticle.ci("complexity_punctuation")
-		print(ci_sentiment)
-		print(ci_length)
+		factors		= ["sentiment_score", "article_length", "complexity_punctuation", "complexity_wordlength", "complexity_complexity", "complexity_duplication"]
+
 		record = {"version": version,
 			  "platform":  "",
 			  "publisher": ""}
-		
-		{
-			  "sentiment_score_cutoff": ci_sentiment["ci90"],
-			  "sentiment_score_scale":  ci_sentiment["ci90"]-ci_sentiment["ci50"],
-			  "article_length_cutoff":  ci_length["ci10"],
-			  "article_length_scale":   ci_length["ci90"]-ci_length["ci10"],
-			  "complexity_punctuation_cutoff":  ci_punctuation["ci10"],
-			  "complexity_punctuation_scale":   ci_punctuation["ci90"]-ci_punctuation["ci10"]
-		}
-		print(record)
+		for factor in factors:
+			ci = TrustAritcle.ci(factor)
+			ci["scale"] = (ci["ci90"] - ci["ci10"])
+			record[factor] = ci
 		parameters = TrustParameters.fromJSON(record)
 		parameters.flush()
 		for (i, item) in enumerate(Article.all()):
@@ -218,13 +206,13 @@ class Analyzer(threading.Thread):
 		Article.requeue()
 
 
-	def parse_document(self, id, text):
-		print(text)
+	def parse_document(self, id, data):
+		Log.info("ParseDocument", id, data, type(data))
 		record = {}
 		record["id"]	     = id
 		try:
-			data = json.loads(text)
-			print(data)
+			if (isinstance(data, str)):
+				data = json.loads(data)				       
 			record["content"]    = data["content"]
 			record["title"]	     = data["title"]
 			record["author"]     = data["author"]
@@ -232,15 +220,17 @@ class Analyzer(threading.Thread):
 			record["platform"]   = "IPFS"
 			
 			      
-		except json.decoder.JSONDecodeError, KeyError:
-			record["content"]    = text
+		except (KeyError, ) as e:
+			record["content"]    = str(data)
 			record["title"]	     = ""
 			record["author"]     = ""
 			record["publisher"]  = ""
 			record["platform"]   = "IPFS"
+		Log.info("ParseDocument", id, record)
 		article = Article.fromJSON(record)
 		article.flush()
 		self.analyse(article)
+		Log.info("ParseDocument - Analysis Done", id, record)
 		request = Request.get(id)
 		request.delete()
 		

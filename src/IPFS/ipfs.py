@@ -41,11 +41,13 @@ class IPFSGateway(object):
 
 			url+'&arg='+str(file_data['file_name'])
 			req = requests.post(url, files={'files': io.StringIO(file_data['content'])})
-			return req.json()
+			callback(req.json())
 		else:
 			headers = {'Content-type' : 'application/x-www-form-urlencoded'}
+			Log.info(url)
 			req = requests.post(url, data=None, headers=headers)
-			return request.json()
+			Log.info(req.json())
+			callback(req.json())
 			#job = grequests.send(req, grequests.Pool(1))
 
 	def execute(self, command, args, file_data, callback):
@@ -57,6 +59,7 @@ class IPFSGateway(object):
 		else:
 			url_args = '?' + "&".join(["{0:s}={1:s}".format(key, value) for key, value in args.items()])
 		url = IPFSGateway.BASE_URL+command+url_args
+		Log.info('Execute', url, command, callback)
 		#Log.debug('Execute', url, command, callback)
 		if not(file_data is None):
 			headers = {'Content-type' : 'multipart/form-data'}
@@ -66,11 +69,14 @@ class IPFSGateway(object):
 			req = grequests.post(url, files={'files': io.StringIO(file_data['content'])}, callback=callback)
 		else:
 			headers = {'Content-type': 'application/x-www-form-urlencoded'}
+			Log.info("IPFS - execute", command, args, file_data, callback)
 			req = grequests.post(url, data=None, headers=headers, callback=callback)
+			Log.info(req)
 		if not (req):
 			Log.info("Invalid request")
 		else:
 			job = grequests.send(req, grequests.Pool(1))
+			Log.info(job)
 
 	def getHash(self, file_name, file_data):
 		args = {'arg': file_name, 'onlyhash': 'true'}
@@ -94,7 +100,7 @@ class IPFSGateway(object):
 		self.execute("pin/add", {"arg": filename}, None, callback)
 
 	def retrieveDocumentFromHash(self, hash, callback):
-		self.execute("cat", {"arg": hash}, None, callback)
+		self.execute_sync("cat", {"arg": hash}, None, callback)
 		
 	def retrieveDocument(self, filename, callback):
 		self.execute("files/read", {"arg": filename}, None, callback)

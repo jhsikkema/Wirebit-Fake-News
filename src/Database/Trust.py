@@ -23,7 +23,7 @@ class Trust(MappedClass):
 	id			= FieldProperty(schema.String(required=True))
 	param_version		= FieldProperty(schema.Int)
 	trust_score		= FieldProperty(schema.Float)
-	inconsistency_score	= FieldProperty(schema.Float)
+	divergency_score	= FieldProperty(schema.Float)
 	sentiment_score		= FieldProperty(schema.Float)
 	layout_score		= FieldProperty(schema.Float)
 	complexity_score	= FieldProperty(schema.Float)
@@ -36,7 +36,7 @@ class Trust(MappedClass):
 			  "param_version":	  self.param_version,
 			  "trust_score":	  self.trust_score,
 			  "sentiment_score":	  self.sentiment_score,
-			  "inconsistency_score":  self.inconsistency_score,
+			  "divergency_score":	  self.divergency_score,
 			  "layout_score":	  self.layout_score,
 			  "complexity_score":	  self.complexity_score,
 			  "platform_score":	  self.platform_score,
@@ -50,15 +50,16 @@ class Trust(MappedClass):
 	
 	@classmethod
 	def fromJSON(self, record):
+		get = lambda key: max(0, min(100, record[key])) if key in record else 101
 		return Trust(id			   = record["id"],
 			     param_version	   = record["param_version"],
-			     score		   = record["score"],
-			     sentiment_score	   = record["sentiment_score"],
-			     inconsistency_score   = record["inconsistency_score"],
-			     layout_score	   = record["layout_score"],
-			     complexity_score	   = record["complexity_score"],
-			     platform_score	   = record["platform_score"],
-			     author_score	   = record["author_score"],
+			     trust_score	   = get("trust_score"),
+			     sentiment_score	   = get("sentiment_score"),
+			     divergency_score	   = get("divergency_score"),
+			     layout_score	   = get("layout_score"),
+			     complexity_score	   = get("complexity_score"),
+			     platform_score	   = get("platform_score"),
+			     author_score	   = get("author_score"),
 			     reasons		   = record["reasons"]
 		)
 

@@ -21,23 +21,26 @@ class TrustParameters(MappedClass):
 	version			= FieldProperty(schema.Int)
 	platform		= FieldProperty(schema.String)
 	publisher		= FieldProperty(schema.String)
-	sentiment_score_cutoff	= FieldProperty(schema.Float)
-	sentiment_score_scale	= FieldProperty(schema.Float)
-	article_length_cutoff	= FieldProperty(schema.Float)
-	article_length_scale	= FieldProperty(schema.Float)
-	complexity_punctuation_cutoff	= FieldProperty(schema.Float)
-	complexity_punctuation_scale	= FieldProperty(schema.Float)
+	sentiment_score		= FieldProperty(schema.String)
+	complexity_punctuation	= FieldProperty(schema.String)
+	complexity_wordlength	= FieldProperty(schema.String)
+	complexity_duplication	= FieldProperty(schema.String)
+	complexity_complexity	= FieldProperty(schema.String)
+	article_length		= FieldProperty(schema.String)
+
+
+
 
 	def toJSON(self):
-		record = {"version":		    self.version,
-			  "platform":		    self.platform,
-			  "publisher":		    self.publisher,
-			  "sentiment_score_cutoff": self.sentiment_score_cutoff,
-			  "sentiment_score_cutoff": self.sentiment_score_scale,
-			  "article_length_cutoff":  self.article_length_cutoff,
-			  "article_length_scale":   self.article_length_scale,
-			  "complexity_punctuation_cutoff":  self.complexity_punctuation_cutoff,
-			  "complexity_punctuation_scale":   self.complexity_punctuation_scale
+		record = {"version":			    self.version,
+			  "platform":			    self.platform,
+k			  "publisher":			    self.publisher,
+			  "sentiment_score":		    json.loads(self.sentiment_score),
+			  "complexity_punctuation":	    json.loads(self.complexity_punctuation),
+			  "complexity_wordlength":	    json.loads(self.complexity_wordlength),
+			  "complexity_duplication":	    json.loads(self.complexity_duplication),
+			  "complexity_complexity":	    json.loads(self.complexity_complexity),
+			  "article_length":		    json.loads(self.article_length)
 		}
 		return record
 
@@ -46,15 +49,15 @@ class TrustParameters(MappedClass):
 	
 	@classmethod
 	def fromJSON(self, record):
-		return TrustParameters(version		   = record["version"],
-				       platform		   = record["platform"],
-				       publisher		   = record["publisher"],
-				       sentiment_score_cutoff = record["sentiment_score_cutoff"],
-				       sentiment_score_scale  = record["sentiment_score_scale"],
-				       article_length_cutoff  = record["article_length_cutoff"],
-				       article_length_scale   = record["article_length_scale"],
-				       complexity_punctuation_cutoff  = record["complexity_punctuation_cutoff"],
-				       complexity_punctuation_scale   = record["complexity_punctuation_scale"]
+		return TrustParameters(version		      = record["version"],
+				       platform		      = record["platform"],
+				       publisher	      = record["publisher"],
+				       sentiment_score	      = json.dumps(self.sentiment_score),
+				       complexity_punctuation = json.dumps(self.complexity_punctuation),
+				       complexity_wordlength  = json.dumps(self.complexity_wordlength),
+				       complexity_duplication = json.dumps(self.complexity_duplication),
+				       complexity_complexity  = json.dumps(self.complexity_complexity),
+				       article_length	      = json.dumps(self.article_length)
 				    )
 
 	@classmethod

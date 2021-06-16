@@ -24,9 +24,9 @@ analyze_ipfs_parser = reqparse.RequestParser()
 analyze_ipfs_parser.add_argument('ipfs_hash',	help = 'This field cannot be blank', required = True)
 
 analyze_query_parser = reqparse.RequestParser()
-analyze_query_parser.add_argument('request_id',	help = 'This field cannot be blank', required = True)
+analyze_query_parser.add_argument('id',	help = 'This field cannot be blank', required = True)
 
 analyze_flag_parser = reqparse.RequestParser()
-analyze_flag_parser.add_argument('request_id',	help = 'This field cannot be blank', required = True)
+analyze_flag_parser.add_argument('id',	help = 'This field cannot be blank', required = True)
 analyze_flag_parser.add_argument('is_expert',	help = 'This field cannot be blank', required = True)
 
