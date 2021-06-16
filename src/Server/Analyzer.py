@@ -25,6 +25,7 @@ from Database.Trust	      import Trust
 from Database.TrustArticle    import TrustArticle
 from Database.TrustParameters import TrustParameters
 from Database.Database import Database
+from IPFS.ipfs import IPFSGateway
 
 # Import according to the docs didn't work on our server
 #from expertai.client import ExpertAiClient
@@ -37,6 +38,7 @@ class Analyzer(threading.Thread):
 	def __init__(self, config):
 		super(Analyzer, self).__init__()
 		self.m_config		      = config
+		self.m_ipfs_gateway	      = IPFSGateway(config)
 		self.m_run		      = False
 		self.m_queue		      = deque()
 		self.m_parameters	      = [item for item in TrustParameters.get(TrustParameters.getVersion())]
@@ -62,10 +64,20 @@ class Analyzer(threading.Thread):
 	def run(self):
 		while self.m_run:
 			queue = Request.getQueue()
-			for item in queue:
-				result = self.analyze(item)
-				if (result):
-					item.delete()
+			for request in queue:
+				request.processing = True
+				article = Article.get(request.id)
+				remove = True
+				if not(article):
+					if (request.fromIPFS()):
+						self.download(request)
+						remove = False
+					else:
+						Log.error("ERROR *** Article not found")
+				else:
+					result = self.analyze(article)
+				if (remove):
+					request.delete()
 					Request.flush()
 			time.sleep(1)
 
@@ -118,12 +130,7 @@ class Analyzer(threading.Thread):
 			"complexity_score":		-1*(word_length + complexity - duplication)
 			}
 			
-	def analyze(self, request):
-		request.processing = True
-		article = Article.get(request.id)
-		if not(article):
-			Log.error("ERROR *** Article not found")
-			return False
+	def analyze(self, article):
 		text_object		     = NRCLex(article.content)
 		sentiment		     = text_object.affect_frequencies
 		complexity		     = self.complexity(article.content)
@@ -186,7 +193,9 @@ class Analyzer(threading.Thread):
 		print(ci_length)
 		record = {"version": version,
 			  "platform":  "",
-			  "publisher": "",
+			  "publisher": ""}
+		
+		{
 			  "sentiment_score_cutoff": ci_sentiment["ci90"],
 			  "sentiment_score_scale":  ci_sentiment["ci90"]-ci_sentiment["ci50"],
 			  "article_length_cutoff":  ci_length["ci10"],
@@ -205,9 +214,38 @@ class Analyzer(threading.Thread):
 	def recalculate(self):
 		TrustArticle.clean()
 		Article.requeue()
+
+
+	def parse_document(self, id, text):
+		print(text)
+		record = {}
+		record["id"]	     = id
+		try:
+			data = json.loads(text)
+			print(data)
+			record["content"]    = data["content"]
+			record["title"]	     = data["title"]
+			record["author"]     = data["author"]
+			record["publisher"]  = data["publisher"]
+			record["platform"]   = "IPFS"
+			
+			      
+		except json.decoder.JSONDecodeError, KeyError:
+			record["content"]    = text
+			record["title"]	     = ""
+			record["author"]     = ""
+			record["publisher"]  = ""
+			record["platform"]   = "IPFS"
+		article = Article.fromJSON(record)
+		article.flush()
+		self.analyse(article)
+		request = Request.get(id)
+		request.delete()
+		
 		
 	def download(self, request):
-		pass
+		ipfs_hash = re.sub("IPFS_", "", request.id)
+		self.m_ipfs_gateway.retrieveDocumentFromHash(ipfs_hash, lambda x: self.parse_document(request.id, x))
 	
 	def start(self):
 		if (self.m_run):
