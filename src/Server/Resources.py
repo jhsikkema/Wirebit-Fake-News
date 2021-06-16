@@ -27,7 +27,7 @@ class AnalyzeText(Resource):
 		found	= Article.get(article.id)
 		if (found):
 			del article
-			return {"id": found.id, "new": False}, 200
+			return {"id": found.id, "new": True}, 200
 		request = Request.fromJSON(article.toJSON())
 		article.flush()
 		request.flush()
@@ -39,7 +39,7 @@ class AnalyzeIPFS(Resource):
 		data	= DataUtil.clean_data(data)
 		record["id"] = Article.genID("", data["ipfs_hash"])
 		if (Article.get(record["id"])):
-			return {"id": id, "new": False}, 200
+			return {"id": id, "new": True}, 200
 		request = Request.fromJSON(record)
 		request.flush()
 		return {"id": request.id, "new": True}, 200
@@ -48,13 +48,13 @@ class AnalyzeQuery(Resource):
 	def post(self):
 		data	= analyze_query_parser.parse_args()
 		data	= DataUtil.clean_data(data)
-		id	= data["request_id"]
+		id	= data["id"]
 		if (Request.get(id)):
-			return {"status": "Processing", "done": False}, 200
+			return {"id": id, "status": "Processing", "done": False}, 200
 		trust	= Trust.get(id)
 		if not(trust):
-			return {"status": "Unknown Request", "done": True}, 200
-		msg = {"status": "Done", "done": True, "data": trust.toJSON()}
+			return {"id": id, "status": "Unknown Request", "done": True}, 200
+		msg = {"id": id, "status": "Done", "done": True, "data": trust.toJSON()}
 		print(msg)
 		return msg, 200
 
@@ -62,7 +62,7 @@ class AnalyzeFlag(Resource):
 	def post(self):
 		data	= analyze_flag_parser.parse_args()
 		data	= DataUtil.clean_data(data)
-		id	= data["request_id"]
+		id	= data["id"]
 		trust	= TrustFlagged.get(id)
 		if not(trust):
 			trust = TrustFlagged.fromJSON({"id":	      id,

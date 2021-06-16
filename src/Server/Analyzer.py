@@ -156,14 +156,16 @@ class Analyzer(threading.Thread):
 		c2 = math.exp(-a2 - b2*record["sentiment_score2"])
 		y2 = 1/(1+c2)
 		
-		trust = {"id":		     record["id"],
-			 "param_version":    self.m_parameters.version,
-			 "score":	     100-100*y1*y2,
-			 "sentiment_score":  100-100*y2,
-			 "layout_score":     100-100*y1,
-			 "complexity_score": 100.0,
-			 "platform_score":   100.0,
-			 "author_score":     100.0
+		trust = {"id":			record["id"],
+			 "param_version":	self.m_parameters.version,
+			 "trust_score":		max(0, min(100, 100-100*y1*y2)),
+			 "sentiment_score":	max(0, min(100, 100-100*y2)),
+			 "divergency_score":	100,
+			 "layout_score":	max(0, min(100, 100-100*y1)),
+			 "complexity_score":	100.0,
+			 "platform_score":	100.0,
+			 "author_score":	100.0,
+			 "reasons":		"[]"
 		}
 		trust = Trust.fromJSON(trust)
 		trust.flush()
