@@ -1,6 +1,6 @@
 import os, os.path
 from flask_restful import Resource
-from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, get_jwt_identity)
 from flask import Response, request
 import re
 import codecs
@@ -55,7 +55,9 @@ class AnalyzeQuery(Resource):
 		if not(trust):
 			return {"id": id, "status": "Unknown Request", "done": True}, 200
 		msg = {"id": id, "status": "Done", "done": True, "data": trust.toJSON()}
-		print(msg)
+		if (request.fromIPFS):
+			article = Article.get(id)
+			msg["text"] = article.content
 		return msg, 200
 
 class AnalyzeFlag(Resource):

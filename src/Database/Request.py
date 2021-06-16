@@ -45,6 +45,8 @@ class Request(MappedClass):
 				 processing  = record["processing"]
 			       )
 
+	def fromIPFS(self):
+		return self.id.startswith("IPFS_")
 
 	@classmethod
 	def getQueue(cls):
