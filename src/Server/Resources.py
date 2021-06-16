@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from Util.DataUtil import DataUtil
 from Server.Parsers import analyze_text_parser, analyze_ipfs_parser, analyze_query_parser
 from Server.Messages import Messages
+from Database.Trust import Trust
 from Database.Article import Article
 from Database.Request import Request
 global ipfs_server
@@ -48,15 +49,16 @@ class AnalyzeQuery(Resource):
 		data	= analyze_query_parser.parse_args()
 		data	= DataUtil.clean_data(data)
 		id	= data["request_id"]
-		if (request.get(id)):
+		if (Request.get(id)):
 			return {"status": "Processing", "done": False}, 200
 		trust	= Trust.get(id)
 		if not(trust):
-			return {"status": "Unknown", "done": False}, 200
+			return {"status": "Unknown Request", "done": True}, 200
+		msg = {"status": "Done", "done": True, "data": trust.toJSON()}
 		if (request.fromIPFS):
 			article = Article.get(id)
-			return {"status": "Done", "done": True, data: trust, "text": article.content}, 200
-		return {"status": "Done", "done": True, data: trust}, 200
+			msg["text"] = article.content
+		return msg, 200
 
 class AnalyzeFlag(Resource):
 	def post(self):
