@@ -34,7 +34,7 @@ class TrustParameters(MappedClass):
 	def toJSON(self):
 		record = {"version":			    self.version,
 			  "platform":			    self.platform,
-k			  "publisher":			    self.publisher,
+			  "publisher":			    self.publisher,
 			  "sentiment_score":		    json.loads(self.sentiment_score),
 			  "complexity_punctuation":	    json.loads(self.complexity_punctuation),
 			  "complexity_wordlength":	    json.loads(self.complexity_wordlength),
