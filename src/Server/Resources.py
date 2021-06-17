@@ -75,14 +75,19 @@ class AnalyzeFlag(Resource):
 		id	= data["id"]
 		trust	= TrustFlagged.get(id)
 		if not(trust):
-			trust = TrustFlagged.fromJSON({"id":	      id,
-						       "is_fake":     True,
-						       "expert_vote": 0,
-						       "reader_vote": 0})
+			trust = TrustFlagged.fromJSON({"id":	          id,
+						       "is_fake":         True,
+						       "expert_vote":     0,
+                                                       "expert_strength": 0, 
+						       "reader_vote":     0,
+                                                       "reader_strength": 0
+                        })
 		if (data["is_expert"]):
 			trust.expert_vote += 1
+                        trust.expert_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
 		else:
 			trust.reader_vote += 1
+                        trust.reader_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
 		trust.flush()
 		return {"status": "Done", "done": True}, 200
 

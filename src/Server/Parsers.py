@@ -29,4 +29,5 @@ analyze_query_parser.add_argument('id',	help = 'This field cannot be blank', req
 analyze_flag_parser = reqparse.RequestParser()
 analyze_flag_parser.add_argument('id',	help = 'This field cannot be blank', required = True)
 analyze_flag_parser.add_argument('is_expert',	help = 'This field cannot be blank', required = True)
+analyze_flag_parser.add_argument('strength',	help = 'This field cannot be blank', required = True)
 
