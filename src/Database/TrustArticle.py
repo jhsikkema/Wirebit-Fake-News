@@ -14,7 +14,7 @@ class TrustArticle(MappedClass):
 	class __mongometa__:
 		session = Database.getInstance()
 		name = 'trust_articles'
-		indexes = [["id"], ["sentiment_score", "platform", "publisher"], ["complexity_score", "platform", "publisher"], ["capital_score", "platform", "publisher"], ["article_length", "platform", "publisher"]]
+		indexes = [["id"], ["sentiment_score", "platform", "publisher"], ["complexity_score", "platform", "publisher"], ["capital_score", "platform", "publisher"], ["article_length", "platform", "publisher"], ["complexity_duplication", "platform", "publisher"], ["complexity_punctuation", "platform", "publisher"], ["complexity_complexity", "platform", "publisher"]]
 
 	_id			= FieldProperty(schema.ObjectId)
 	
@@ -120,8 +120,11 @@ class TrustArticle(MappedClass):
 			  "ci50": values[int(0.5*len(values))],
 			  "ci90": values[int(0.9*len(values))],
 			  "max":  values[len(values)-1]
+
+
 			  }
-		print(result)
+		del values
+		print(factor, result)
 		return result
 
 	@classmethod

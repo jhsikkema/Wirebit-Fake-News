@@ -23,7 +23,7 @@ class TrustParameters(MappedClass):
 	publisher		= FieldProperty(schema.String)
 	sentiment_score		= FieldProperty(schema.String)
 	complexity_punctuation	= FieldProperty(schema.String)
-	complexity_wordlength	= FieldProperty(schema.String)
+	complexity_word_length	= FieldProperty(schema.String)
 	complexity_duplication	= FieldProperty(schema.String)
 	complexity_complexity	= FieldProperty(schema.String)
 	article_length		= FieldProperty(schema.String)
@@ -37,7 +37,7 @@ class TrustParameters(MappedClass):
 			  "publisher":			    self.publisher,
 			  "sentiment_score":		    json.loads(self.sentiment_score),
 			  "complexity_punctuation":	    json.loads(self.complexity_punctuation),
-			  "complexity_wordlength":	    json.loads(self.complexity_wordlength),
+			  "complexity_word_length":	    json.loads(self.complexity_word_length),
 			  "complexity_duplication":	    json.loads(self.complexity_duplication),
 			  "complexity_complexity":	    json.loads(self.complexity_complexity),
 			  "article_length":		    json.loads(self.article_length)
@@ -52,12 +52,12 @@ class TrustParameters(MappedClass):
 		return TrustParameters(version		      = record["version"],
 				       platform		      = record["platform"],
 				       publisher	      = record["publisher"],
-				       sentiment_score	      = json.dumps(self.sentiment_score),
-				       complexity_punctuation = json.dumps(self.complexity_punctuation),
-				       complexity_wordlength  = json.dumps(self.complexity_wordlength),
-				       complexity_duplication = json.dumps(self.complexity_duplication),
-				       complexity_complexity  = json.dumps(self.complexity_complexity),
-				       article_length	      = json.dumps(self.article_length)
+				       sentiment_score	      = json.dumps(record["sentiment_score"]),
+				       complexity_punctuation = json.dumps(record["complexity_punctuation"]),
+				       complexity_word_length = json.dumps(record["complexity_word_length"]),
+				       complexity_duplication = json.dumps(record["complexity_duplication"]),
+				       complexity_complexity  = json.dumps(record["complexity_complexity"]),
+				       article_length	      = json.dumps(record["article_length"])
 				    )
 
 	@classmethod

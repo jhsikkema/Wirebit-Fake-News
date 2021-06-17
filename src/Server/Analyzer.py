@@ -185,13 +185,13 @@ class Analyzer(threading.Thread):
 		Article.requeue()
 		
 		version		= TrustParameters.getVersion()+1
-		factors		= ["sentiment_score", "article_length", "complexity_punctuation", "complexity_wordlength", "complexity_complexity", "complexity_duplication"]
+		factors		= ["sentiment_score", "article_length", "complexity_punctuation", "complexity_word_length", "complexity_complexity", "complexity_duplication"]
 
 		record = {"version": version,
 			  "platform":  "",
 			  "publisher": ""}
 		for factor in factors:
-			ci = TrustAritcle.ci(factor)
+			ci = TrustArticle.ci(factor)
 			ci["scale"] = (ci["ci90"] - ci["ci10"])
 			record[factor] = ci
 		parameters = TrustParameters.fromJSON(record)

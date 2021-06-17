@@ -73,7 +73,7 @@ class AnalyzeFlag(Resource):
 		data	= analyze_flag_parser.parse_args()
 		data	= DataUtil.clean_data(data)
 		if (data["strength"] < -100 or data["strength"] > 100):
-			return {"status": "Error", "done": True, "error": True, "message": Strength must lie between -100 to +100}, 500
+			return {"status": "Error", "done": True, "error": True, "message": "Strength must lie between -100 to +100"}, 500
 		id	= data["id"]
 		trust	= TrustFlagged.get(id)
 		if not(trust):
