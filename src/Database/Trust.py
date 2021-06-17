@@ -41,7 +41,7 @@ class Trust(MappedClass):
 			  "complexity_score":	  self.complexity_score,
 			  "platform_score":	  self.platform_score,
 			  "author_score":	  self.author_score,
-			  "reasons":		  self.reasons,
+			  "reasons":		  json.loads(self.reasons),
 			  }
 		return record
 
@@ -60,7 +60,7 @@ class Trust(MappedClass):
 			     complexity_score	   = get("complexity_score"),
 			     platform_score	   = get("platform_score"),
 			     author_score	   = get("author_score"),
-			     reasons		   = record["reasons"]
+			     reasons		   = json.dumps(record["reasons"])
 		)
 
 

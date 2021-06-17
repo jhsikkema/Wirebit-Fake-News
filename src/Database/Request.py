@@ -57,6 +57,9 @@ class Request(MappedClass):
 	def get(cls, id):
 		return cls.query.find({"id": id}).first()
 
+	def remove(self):
+		cls.query.remove({"id": self.id})
+		self.flush()
 	
 
 	@classmethod
