@@ -72,22 +72,24 @@ class AnalyzeFlag(Resource):
 	def post(self):
 		data	= analyze_flag_parser.parse_args()
 		data	= DataUtil.clean_data(data)
+		if (data["strength"] < -100 or data["strength"] > 100):
+			return {"status": "Error", "done": True, "error": True, "message": Strength must lie between -100 to +100}, 500
 		id	= data["id"]
 		trust	= TrustFlagged.get(id)
 		if not(trust):
-			trust = TrustFlagged.fromJSON({"id":	          id,
-						       "is_fake":         True,
-						       "expert_vote":     0,
-                                                       "expert_strength": 0, 
-						       "reader_vote":     0,
-                                                       "reader_strength": 0
-                        })
+			trust = TrustFlagged.fromJSON({"id":		  id,
+						       "is_fake":	  True,
+						       "expert_vote":	  0,
+						       "expert_strength": 0, 
+						       "reader_vote":	  0,
+						       "reader_strength": 0
+			})
 		if (data["is_expert"]):
 			trust.expert_vote += 1
-                        trust.expert_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
+			trust.expert_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
 		else:
 			trust.reader_vote += 1
-                        trust.reader_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
+			trust.reader_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
 		trust.flush()
 		return {"status": "Done", "done": True}, 200
 
