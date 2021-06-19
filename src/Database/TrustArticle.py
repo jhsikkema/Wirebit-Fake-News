@@ -134,7 +134,7 @@ class TrustArticle(MappedClass):
 	
 	@classmethod
 	def get(cls, id):
-		return cls.query.find({'id': id}).first()
+		return cls.query.find({'id': id}).all()
 
 	@classmethod
 	def flush(cls):

@@ -94,7 +94,7 @@ class TrustParameters(MappedClass):
 	
 	@classmethod
 	def get(cls, version):
-		return cls.query.find({"version": version}).all()
+		return [item.toJSON() for item in  cls.query.find({"version": version}).all()]
 	
 	@classmethod
 	def flush(cls):
