@@ -1,5 +1,7 @@
 import os, os.path
 import json
+import math
+
 from datetime import datetime, timedelta
 from Util.Const import Const
 from Util.Config import Config
@@ -17,13 +19,13 @@ class Model(object):
 	def __init__(self, config):
 		super(Model, self).__init__()
 		self.m_config		      = config
-		self.m_parameters	      = dict([(item.platform, item) for item in TrustParameters.get(TrustParameters.getVersion())])
-		self.m_param_version	      = min([item.version for item in self.m_parameters.values()])
+		self.m_param_version	      = TrustParameters.getVersion()
+		#print(TrustParameters.get(self.m_param_version))
+		self.m_parameters	      = dict([(item["platform"], item) for item in TrustParameters.get(self.m_param_version)])
+		#print(self.m_parameters)
 		Model.VERSION		      = config[ModelConst.VERSION]
 		print(Model.VERSION)
-		print(type(Model.VERSION))
 		base_path	  = config[ModelConst.BASE_PATH]
-		print(base_path)
 		self.m_model_path = os.path.join(base_path, "model_{0:s}.json".format(Model.VERSION))
 		self.m_coeff_path = os.path.join(base_path, "coeff_{0:s}.h5".format(Model.VERSION))
 
@@ -35,40 +37,41 @@ class Model(object):
 
 		
 	def features(self, trust_article):
-		parameters	       = self.m_parameters[platform]
-		platform	       = trust_article.platform if trust_article.platform in self.m_parameters else ModelConst.PLATFORM_ALL
 		
-		a1  = parameters.sentiment_score2["ci90"]
-		b1  = parameters.sentiment_score2["scale"]
-		a2  = parameters.sentiment_score2["ci90"]
-		b2  = parameters.sentiment_score2["scale"]
-		a3  = parameters.article_length["ci10"]
-		b3  = parameters.article_length["scale"]
-		a41 = parameters.complexity_punctuation["ci10"]
-		a42 = parameters.complexity_punctuation["ci90"]
-		a5  = parameters.complexity_word_length["ci10"]
-		a6  = parameters.complexity_complexity["ci10"]
-		a7  = parameters.complexity_duplication["ci10"]
-		a8  = min(parameters.sentiment_expertai_positive["ci90"], parameters.sentiment_expertai_negative["ci90"])
-		s91pos = parameters.sentiment_expertai_positive["ci90"]
-		s91neg = parameters.sentiment_expertai_negative["ci90"]
-		s91com = parameters.complexity_expertai["ci50"]
-		s92pos = parameters.sentiment_positive["ci90"]
-		s92neg = parameters.sentiment_negative["ci90"]
-		s92    = parameters.complexity_complexity["ci50"]
+		platform	       = trust_article.platform if trust_article.platform in self.m_parameters else ModelConst.PLATFORM_ALL
+		parameters	       = self.m_parameters[platform]
+		a1  = parameters["sentiment_score"]["ci90"]
+		b1  = parameters["sentiment_score"]["scale"]
+		a2  = parameters["sentiment_score2"]["ci90"]
+		b2  = parameters["sentiment_score2"]["scale"]
+		a3  = parameters["article_length"]["ci10"]
+		b3  = parameters["article_length"]["scale"]
+		a41 = parameters["complexity_punctuation"]["ci10"]
+		a42 = parameters["complexity_punctuation"]["ci90"]
+		a5  = parameters["complexity_word_length"]["ci10"]
+		a6  = parameters["complexity_complexity"]["ci10"]
+		a7  = parameters["complexity_duplication"]["ci10"]
+		a8  = min(parameters["sentiment_expertai_positive"]["ci90"], parameters["sentiment_expertai_negative"]["ci90"])
+		s91pos = parameters["sentiment_expertai_positive"]["ci90"]
+		s91neg = parameters["sentiment_expertai_negative"]["ci90"]
+		s91com = parameters["complexity_expertai"]["ci50"]
+		s92pos = parameters["sentiment_positive"]["ci90"]
+		s92neg = parameters["sentiment_negative"]["ci90"]
+		s92com = parameters["complexity_complexity"]["ci50"]
+		baserate = parameters["baserate"]
 		# Positive Divergence
 		if (trust_article.sentiment_expertai_positive >= 0):
-			div_pos = math.abs(trust_article.sentiment_expertai_positive/s91pos - trust_article.sentiment_positive/s92pos)
+			div_pos = abs(trust_article.sentiment_expertai_positive/s91pos - trust_article.sentiment_positive/s92pos)
 		else:
 			div_pos = 0
 		# Negative Divergence
 		if (trust_article.sentiment_expertai_negative >= 0):
-			div_neg = math.abs(trust_article.sentiment_expertai_negative/s91neg - trust_article.sentiment_positive/s92neg)
+			div_neg = abs(trust_article.sentiment_expertai_negative/s91neg - trust_article.sentiment_positive/s92neg)
 		else:
 			div_neg = 0
 		# Complexity Divergence
 		if (trust_article.complexity_expertai >= 0):
-			div_com = math.abs(trust_article.complexity_expertai/s91com - trust_article.complexity_complexity/s92com)
+			div_com = abs(trust_article.complexity_expertai/s91com - trust_article.complexity_complexity/s92com)
 					   
 			
 		norm = lambda x: max(0, min(1, x))
@@ -80,13 +83,31 @@ class Model(object):
 			  "complexity_complexity":  1 if (trust_article.complexity_complexity  < a6) else 0,
 			  "complexity_duplication": 1 if (trust_article.complexity_duplication < a7) else 0,
 			  "complexity_word_length": 1 if (trust_article.complexity_word_length < a5) else 0,
-			   "platform":	  platforms[trust_articles.platform] if (trust_article.platform) in platforms else 0.5,
+			  "platform":	  1-baserate,
 			  "divergency":	  norm(max(div_pos, div_neg, div_com)),
-			  "author":	 1
+			  "author":	  0
 			  }
 		return record		     
 
-	
+
+	def reasons(self, features):
+		reasons		       = []
+		if (features["punctuation"] > 0.5):
+			  reasons.append("Suspicious Puntuation")
+		if (features["sentiment"] > 0.5):
+			  reasons.append("Suspicious Emotional Response")
+		if (features["article_length"] > 0.5):
+			  reasons.append("Article is shorter than expected")
+		if (features["complexity_word_length"] > 0.5):
+			  reasons.append("Simlistic Word Use")
+		if (features["complexity_duplication"] > 0.5):
+			  reasons.append("Repetitive Word Use")
+		if (features["complexity_complexity"] > 0.5):
+			  reasons.append("Suspicious Word Use")
+		if (features["divergency"] > 0.5):
+			  reasons.append("Suspicious Incompatability between algorithms")
+		return reasons
+			  
 	def score(self, trust_article):
 		if not(self.m_parameters):
 			return
@@ -96,6 +117,8 @@ class Model(object):
 		trust		       = self.predict(features)
 		trust["id"]	       = trust_article.id
 		trust["param_version"] = self.m_param_version
+		trust["reasons"]       = self.reasons(features)
+
 		trust = Trust.fromJSON(trust)
 		trust.flush()
 		return trust
