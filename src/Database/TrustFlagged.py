@@ -20,17 +20,16 @@ class TrustFlagged(MappedClass):
 	
 	id			= FieldProperty(schema.String(required=True))
 	is_fake			= FieldProperty(schema.Bool)
-	export_vote		= FieldProperty(schema.Int)
-	export_strength		= FieldProperty(schema.Float)
-	
+	expert_vote		= FieldProperty(schema.Int)
+	expert_strength		= FieldProperty(schema.Float)
 	reader_vote		= FieldProperty(schema.Int)
 	reader_strength		= FieldProperty(schema.Float)
 
 	def toJSON(self):
 		record = {"id":			  self.id,
 			  "is_fake":		  self.is_fake,
-			  "export_vote":	  self.export_vote,
-			  "export_strength":	  self.export_strength,
+			  "expert_vote":	  self.expert_vote,
+			  "expert_strength":	  self.expert_strength,
 			  "reader_vote":	  self.reader_vote,
 			  "reader_strength":	  self.reader_strength
 			  }
@@ -41,17 +40,20 @@ class TrustFlagged(MappedClass):
 	
 	@classmethod
 	def fromJSON(self, record):
-		return TrustArticle(id			   = record["id"],
+		return TrustFlagged(id			   = record["id"],
 				    is_fake		   = record["is_fake"],
-				    expert_vote		   = record["export_vote"],
-				    expert_strength	   = record["export_strength"],
+				    expert_vote		   = record["expert_vote"],
+				    expert_strength	   = record["expert_strength"],
 				    reader_vote		   = record["reader_vote"],
 				    reader_strength	   = record["reader_strength"]
 				    )
 
 	@classmethod
 	def get(cls, id):
-		return cls.query.find({'id': id}).first()
+		Log.info("TrustFlagged - get", id)
+		result = cls.query.find({'id': id}).first()
+		Log.info("TrustFlagged - get", result)
+		return result
 
 	@classmethod
 	def flush(cls):
