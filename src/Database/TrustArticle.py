@@ -119,6 +119,7 @@ class TrustArticle(MappedClass):
 			  "ci10": values[int(0.1*len(values))],
 			  "ci50": values[int(0.5*len(values))],
 			  "ci90": values[int(0.9*len(values))],
+			  "mean": sum(values)/max(1, len(values)),
 			  "max":  values[len(values)-1]
 
 
@@ -133,7 +134,7 @@ class TrustArticle(MappedClass):
 	
 	@classmethod
 	def get(cls, id):
-		return cls.query.find({'id': id}).all()
+		return cls.query.find({'id': id}).first()
 
 	@classmethod
 	def flush(cls):

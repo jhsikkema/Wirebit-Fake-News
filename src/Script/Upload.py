@@ -11,11 +11,12 @@ routes	 = {'text':  analyzer+'/analyze/text',
 	    'query': analyzer+'/analyze/query'}
 
 for (i, item) in enumerate(articles.find()):
-	if i < 258000:
+	if i < 256000:
 		continue
-	print(i)
+	#print(i)
 	if i%1000 == 0:
-		time.sleep(8)
+		print(i)
+		time.sleep(10)
 	record = {'content':   item['content'],
 		  'title':     item['title'],
 		  'platform':  "bywire",
@@ -25,7 +26,6 @@ for (i, item) in enumerate(articles.find()):
 		record[key] = record[key] if record[key] else ""
 	request = requests.post(routes['text'], params=record)
 	response = json.loads(request.text)
-	print(response)
 	id = response["id"]
 	if response["new"]:
 		time.sleep(0.01)

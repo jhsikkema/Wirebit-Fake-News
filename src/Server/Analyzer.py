@@ -27,8 +27,9 @@ from Database.TrustParameters import TrustParameters
 from Database.Database import Database
 from IPFS.ipfs import IPFSGateway
 
-# Import according to the docs didn't work on our server
-#from expertai.client import ExpertAiClient
+from Model.ModelFactory import ModelFactory
+from Model.ModelConst import ModelConst
+# Import according to the docs didn't work with the standard ubuntu installation. 
 from expertai.nlapi.common.errors import ExpertAiRequestError as ExpertAiRequestError
 
 class Analyzer(threading.Thread):
@@ -41,17 +42,14 @@ class Analyzer(threading.Thread):
 		self.m_ipfs_gateway	      = IPFSGateway(config)
 		self.m_run		      = False
 		self.m_queue		      = deque()
-		self.m_parameters	      = [item for item in TrustParameters.get(TrustParameters.getVersion())]
-		print("PARAMETERS")
-		print(self.m_parameters)
-		self.m_parameters	      = self.m_parameters[0] if self.m_parameters else None
+		self.m_model		      = ModelFactory.build(config)
+		self.m_model.load()
 		self.m_nlp_client	      = None
 		if config[Const.EXPERTAI_USE].lower() == "true":
 			os.environ["EAI_USERNAME"] = config[Const.EXPERTAI_USERNAME]
 			os.environ["EAI_PASSWORD"] = config[Const.EXPERTAI_PASSWORD]
 			self.m_nlp_client = ExpertAiClient()
 			
-		print(self.m_parameters)
 
 		
 	@classmethod
@@ -80,7 +78,7 @@ class Analyzer(threading.Thread):
 
 	def send_to_api(self, text, language, resource):
 		try:
-			document = client.specific_resource_analysis(
+			document = self.m_nlp_client.specific_resource_analysis(
 				body={"document": {"text": text}}, 
 				params={'language': language, 'resource': resource})
 
@@ -94,17 +92,19 @@ class Analyzer(threading.Thread):
 			
 
 	def enrich(self, text):
+		if not(self.m_nlp_client):
+			return {"sentiment_expertai_postive":	 -1.0,
+				  "sentiment_expertai_negative": -1.0,
+				  "complexity_expertai":	 -1.0}
 		sentiment_output   = self.send_to_api(text, 'en', 'sentiment')
 		complexity_output  = self.send_to_api(text, 'en', 'deep-linguistic-analysis')
+		print(complexity_output)
 		try:
-			
 			record = {"sentiment_expertai_postive":	 sentiment_output.sentiment.postive,
 				  "sentiment_expertai_negative": sentiment_output.sentiment.negative,
 				  "complexity_expertai": 0.0}
 		except AttributeError as e:
 			traceback.print_tb()
-			
-
 		return record
 			
 		
@@ -131,7 +131,7 @@ class Analyzer(threading.Thread):
 		text_object		     = NRCLex(article.content)
 		sentiment		     = text_object.affect_frequencies
 		complexity		     = self.complexity(article.content)
-		
+		enriched		     = self.enrich(article.content)
 		record			     = {}
 		record["id"]		     = article.id
 		record["publisher"]	     = article.publisher
@@ -140,42 +140,17 @@ class Analyzer(threading.Thread):
 			record["sentiment_{0:s}".format(key)] = value
 		for (key, value) in complexity.items():
 			record[key] = value
+		for (key, value) in enriched.items():
+			record[key] = value
 		record["sentiment"]	     = sentiment["positive"] - sentiment["negative"]
 		record["sentiment_score"]    = sentiment["anger"]  - sentiment["sadness"]
 		record["sentiment_score2"]   = sentiment["anger"] + sentiment["fear"]  - 2*sentiment["sadness"] - sentiment["trust"]
 		record["capital_score"]	     = sum(1 for letter in article.content if letter.isupper())/max(1, len(article.content))
 		record["article_length"]     = len(article.content)
 		trust			     = TrustArticle.fromJSON(record)
-		self.score(record)
+		self.m_model.score(trust)
 		return True
 
-	def score(self, record):
-		Log.info("Scoring")
-		if not(self.m_parameters):
-			return
-		a1 = self.m_parameters.article_length["ci10"]
-		b1 = self.m_parameters.article_length["scale"]
-		a2 = self.m_parameters.sentiment_score["ci90"]
-		b2 = self.m_parameters.sentiment_score["scale"]
-		y1 = max(0, 1-b1*(record["article_length"]-a1))
-		c2 = math.exp(-a2 - b2*record["sentiment_score2"])
-		y2 = 1/(1+c2)
-		
-		trust = {"id":			record["id"],
-			 "param_version":	self.m_parameters.version,
-			 "trust_score":		max(0, min(100, 100-100*y1*y2)),
-			 "sentiment_score":	max(0, min(100, 100-100*y2)),
-			 "divergency_score":	100,
-			 "layout_score":	max(0, min(100, 100-100*y1)),
-			 "complexity_score":	100.0,
-			 "platform_score":	100.0,
-			 "author_score":	100.0,
-			 "reasons":		"[]"
-		}
-		trust = Trust.fromJSON(trust)
-		trust.flush()
-		
-	
 	def clean(self):
 		""" Frees up space from old algorithms
 		"""
@@ -185,19 +160,23 @@ class Analyzer(threading.Thread):
 		Article.requeue()
 		
 		version		= TrustParameters.getVersion()+1
-		factors		= ["sentiment_score", "article_length", "complexity_punctuation", "complexity_word_length", "complexity_complexity", "complexity_duplication"]
+		factors		= ["sentiment_score", "sentiment_score2", "sentiment_positive", "sentiment_negative", "article_length", "complexity_punctuation", "complexity_word_length", "complexity_complexity", "complexity_duplication", "sentiment_expertai_positive", "sentiment_expertai_negative", "complexity_expertai"]
 
 		record = {"version": version,
-			  "platform":  "",
+			  "platform":  ModelConst.PLATFORM_ALL,
 			  "publisher": ""}
 		for factor in factors:
 			ci = TrustArticle.ci(factor)
 			ci["scale"] = (ci["ci90"] - ci["ci10"])
 			record[factor] = ci
+		record["baserate"] = 1
 		parameters = TrustParameters.fromJSON(record)
 		parameters.flush()
+		self.m_model.train()
+		self.m_model.save()
 		for (i, item) in enumerate(Article.all()):
-			self.score(item)
+			trust = TrustArticle.get(item["id"])
+			self.m_model.score(trust)
 			if (i % 1000 == 0):
 				print(i)
 		
@@ -249,31 +228,7 @@ class Analyzer(threading.Thread):
 		self.m_run = False
 
 
-	def validate(self, article_hash):
-		articles = PublishedArticle.getArticleByHASH(article_hash)
-		if len(articles) == 0:
-			return ErrorCodes.VALIDATE_ARTICLE_NOT_RECOGNIZED
-		article		   = articles[0]
-		msg		   = ErrorCodes.VALIDATE_ARTICLE_SUCCESS
-		block		   = article.toJSON()
-		block['ipfs_hash'] = article.article
-		block['id']	   = article.article
-		block['url']	   = self.m_config[Const.STORAGE_BLOCK_EXPLORER_URL].format(**block)
-		block['ipfs_url_local'] = "http://localhost:5001/api/v0/cat?arg={0:s}".format(str(article_hash))
-		block['ipfs_url_global'] = "https://ipfs.io/ipfs/{0:s}".format(str(article_hash))
-		msg['message'] = block
-		return msg
-
-
-
-
 if __name__=='__main__':
-	parser = argparse.ArgumentParser(description="Run stand alone block explorer")
-	parser.add_argument("--load-historic",	     help="Load historic data from file", action="store_true")
-	parser.add_argument("--export-historic",     help="Export historic data from file", default="")
-	parser.add_argument("--reload-transactions", help="Force loading older transactions", action="store_true")
-	args = parser.parse_args()
-
 	os.environ['FLASK_ENV'] = 'development'
 
 	with Config(Const.CONFIG_PATH) as config:

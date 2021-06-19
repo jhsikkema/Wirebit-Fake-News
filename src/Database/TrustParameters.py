@@ -18,17 +18,22 @@ class TrustParameters(MappedClass):
 
 	_id			= FieldProperty(schema.ObjectId)
 	
-	version			= FieldProperty(schema.Int)
-	platform		= FieldProperty(schema.String)
-	publisher		= FieldProperty(schema.String)
-	sentiment_score		= FieldProperty(schema.String)
-	complexity_punctuation	= FieldProperty(schema.String)
-	complexity_word_length	= FieldProperty(schema.String)
-	complexity_duplication	= FieldProperty(schema.String)
-	complexity_complexity	= FieldProperty(schema.String)
-	article_length		= FieldProperty(schema.String)
-
-
+	version				= FieldProperty(schema.Int)
+	platform			= FieldProperty(schema.String)
+	publisher			= FieldProperty(schema.String)
+	sentiment_score			= FieldProperty(schema.String)
+	sentiment_score2		= FieldProperty(schema.String)
+	sentiment_positive		= FieldProperty(schema.String)
+	sentiment_negative		= FieldProperty(schema.String)
+	sentiment_expertai_positive	= FieldProperty(schema.String)
+	sentiment_expertai_negative	= FieldProperty(schema.String)
+	article_length			= FieldProperty(schema.String)
+	complexity_punctuation		= FieldProperty(schema.String)
+	complexity_word_length		= FieldProperty(schema.String)
+	complexity_duplication		= FieldProperty(schema.String)
+	complexity_complexity		= FieldProperty(schema.String)
+	complexity_expertai		= FieldProperty(schema.String)
+	baserate			= FieldProperty(schema.Float)
 
 
 	def toJSON(self):
@@ -36,11 +41,19 @@ class TrustParameters(MappedClass):
 			  "platform":			    self.platform,
 			  "publisher":			    self.publisher,
 			  "sentiment_score":		    json.loads(self.sentiment_score),
+			  "sentiment_score2":		    json.loads(self.sentiment_score2),
+			  "sentiment_positive":		    json.loads(self.sentiment_positive),
+			  "sentiment_negative":		    json.loads(self.sentiment_negative),
+			  "sentiment_expertai_positive":    json.loads(self.sentiment_expertai_positive),
+			  "sentiment_expertai_negative":    json.loads(self.sentiment_expertai_negative),
+			  "article_length":		    json.loads(self.article_length),
 			  "complexity_punctuation":	    json.loads(self.complexity_punctuation),
 			  "complexity_word_length":	    json.loads(self.complexity_word_length),
 			  "complexity_duplication":	    json.loads(self.complexity_duplication),
 			  "complexity_complexity":	    json.loads(self.complexity_complexity),
-			  "article_length":		    json.loads(self.article_length)
+			  "complexity_expertai":	    json.loads(self.complexity_expertai),
+			  "baserate":			    self.baserate
+			  
 		}
 		return record
 
@@ -49,15 +62,23 @@ class TrustParameters(MappedClass):
 	
 	@classmethod
 	def fromJSON(self, record):
-		return TrustParameters(version		      = record["version"],
-				       platform		      = record["platform"],
-				       publisher	      = record["publisher"],
-				       sentiment_score	      = json.dumps(record["sentiment_score"]),
+		return TrustParameters(version			   = record["version"],
+				       platform			   = record["platform"],
+				       publisher		   = record["publisher"],
+				       sentiment_score		   = json.dumps(record["sentiment_score"]),
+				       sentiment_score2		   = json.dumps(record["sentiment_score2"]),
+				       sentiment_positive	   = json.dumps(record["sentiment_positive"]),
+				       sentiment_negative	   = json.dumps(record["sentiment_negative"]),
+				       sentiment_expertai_positive = json.dumps(record["sentiment_expertai_positive"]),
+				       sentiment_expertai_negative = json.dumps(record["sentiment_expertai_negative"]),
+				       article_length	      = json.dumps(record["article_length"]),
 				       complexity_punctuation = json.dumps(record["complexity_punctuation"]),
 				       complexity_word_length = json.dumps(record["complexity_word_length"]),
 				       complexity_duplication = json.dumps(record["complexity_duplication"]),
 				       complexity_complexity  = json.dumps(record["complexity_complexity"]),
-				       article_length	      = json.dumps(record["article_length"])
+				       complexity_expertai    = json.dumps(record["complexity_expertai"]),
+
+				       baserate		      = record["baserate"]
 				    )
 
 	@classmethod

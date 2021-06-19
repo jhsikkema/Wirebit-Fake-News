@@ -12,6 +12,18 @@
       <password> Nel%mezz0! </password>
     </expertai>
   </api>
+
+  <model>
+    <path> Config/Model </path>
+    <version> 0.1 </version>
+    <type> heuristic </type>
+    <ann>
+      <layers> 12|8 </layers>
+      <epochs> 150 </epochs>
+      <batchsize> 10 </batchsize>
+      <expert-panel> 20 </expert-panel>
+    </ann>
+  </model>
   
   <storage>
     <base-path> ./Data </base-path>

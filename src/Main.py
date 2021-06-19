@@ -60,6 +60,7 @@ api.add_resource(Resources.AnalyzeFlag,			'/analyze/flag')
 api.add_resource(Resources.AnalyzeText,			'/analyze/text')
 api.add_resource(Resources.AnalyzeIPFS,			'/analyze/ipfs')
 api.add_resource(Resources.AnalyzeQuery,		'/analyze/query')
+api.add_resource(Resources.BrewCoffee,	        	'/brew/coffee')
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
