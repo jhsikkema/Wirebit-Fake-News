@@ -18,7 +18,7 @@ For more details on how the algorithm was implemented and which features are act
 At the moment we use nlp to turn the text into the following features. They are described in more detail in the [draft whitepaper](/whitepaper/whitepaper_trust.pdf) and it's references. The whitepaper is included in this repository as it explains some fundamental concepts necessary for understanding the theory why the prototype works but it definitely needs more word before publishing and is under active development. At the moment we have the following features. It must be remembered that this is a rough draft, where shortcuts where taken to get a working prototype. Any statements made are hypotheses and we are not sure if they are true, but they form a suspicion why a feature may be worth investigation. Please remember that many features can be refined upon (e.g. mapping sinonyms), but due to a lack of time. 
 * Sentiment
   * sentiment1. This is the anger minus sadness score from the nrc sentiment as calculated by nrclex, normalized by the spread (10% - 90% confidence interval). The idea that the aim of fake news is to spread. On the internet anger and joy spread while sadness inhibits the spread ([as described in one of the first interviews from trendfollowing](https://www.trendfollowing.com/podcast/). Additionally anger has the benefit that it induces us to action [a better explanation can be found here](https://www.smithsonianmag.com/science-nature/what-emotion-goes-viral-fastest-180950182/)
-  * sentiment2. This is a more elaborate version of sentiment2 by using the anger + fear - sadness - trust scores.
+  * sentiment2. This is a more elaborate version of sentiment1 by using the anger + fear - sadness - trust scores.
   * euphoria. This is maximum of positive euphoria and negative euphoria (depression). These are the positive and negative sentiment scores as calculated by expertai normalized to 1 for the top 10% (90% confidence interval) and a linear increase from the top 50% (median) to the top 10%.
 * Complexity
   * word_length. This is the ratio of length of the clean text (removing punctuation, html and stop words) to the number of words. It was calculated using the nltk library. We suspect that having longer words might make a text harder to read and therefor harder to spread. 
@@ -72,7 +72,21 @@ The following are very much for development purposes.
 {"trust_score": 99, "sentiment_score": 80, "layout_score": 100, "complexity_score": 100, "divergence_score": 100, "platform_score": 100, "author_score": 100, "reasons": ["Provokes Anger"]}
 
 ## Team
-Jetze Sikkema (Implementation & Algorithm Development)
-Michael O'Sullivan (Frontend & Publicity)
+Jetze Sikkema (Implementation, Algorithm Development & Prosecco Programming)
+Michael O'Sullivan (Frontend & Drinking Beer with Fried Chicken on the side)
 
 
+## Examples
+Here are some examples of fake news stories and real news stories. The ipfs hashes you can use to load the stories into the Bywire Disinformation Detector are added. The fake news stories were the first ones to appear on a google search for fake news. The real news stories were the first stories that appeared in the guardian and bbc on the 18th of June. However we expect the algorithm to not always work this good as these were our first trials.
+* Fake News
+  * "Pope Franciscus endorses Donald trump". **Bywire Trust 1 - ipfs: **. A discussion of this article can be found [here](https://www.buzzfeednews.com/article/craigsilverman/the-strangest-fake-news-empire) and [here](https://www.snopes.com/fact-check/pope-francis-donald-trump-endorsement/)
+  * "Biden Calls Trump and Supporters “Dregs of Society”". **Bywire Trust: xx - ipfs: 22. The aricle can be found [here](https://twincitiesbusinessradio.com/content/all/biden-calls-trump-and-supporters-dregs-of-society )
+  * "Nancy Pelosi’s Son Was Exec At Gas Company That Did Business In Ukraine". **Bywire Trust: 14 - ipfs: **
+
+* Real News
+  * Juneteenth: After decades, Opal Lee finally gets her day off.  **Bywire Trust: 76 - ipfs: **. The article can be found [here](https://www.bbc.com/news/world-us-canada-57536944)
+  * HSBC offers sub-1% mortgage as interest rate war intensifies. **Bywire Trust: 86 - ipfs: **. The article can be found [here](https://www.theguardian.com/money/2021/jun/18/hsbc-mortgage-interest-rate-banks-building-societies-house-prices)
+  * Praise and condemnation for Iran's new hardline president. **Bywire Trust: 61 - ipfs **. The article can be found [here](https://www.reuters.com/world/middle-east/praise-disdain-irans-new-hardline-president-2021-06-19/)
+
+
+61
