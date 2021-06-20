@@ -80,7 +80,7 @@ Michael O'Sullivan (Frontend & Drinking Beer with Fried Chicken on the side)
 Here are some examples of fake news stories and real news stories. The ipfs hashes you can use to load the stories into the Bywire Disinformation Detector are added. The fake news stories were the first ones to appear on a google search for fake news. The real news stories were the first stories that appeared in the guardian and bbc on the 18th of June. However we expect the algorithm to not always work this good as these were our first trials.
 * Fake News
   * "Pope Franciscus endorses Donald trump". **Bywire Trust 1 - ipfs: **. A discussion of this article can be found [here](https://www.buzzfeednews.com/article/craigsilverman/the-strangest-fake-news-empire) and [here](https://www.snopes.com/fact-check/pope-francis-donald-trump-endorsement/)
-  * "Biden Calls Trump and Supporters “Dregs of Society”". **Bywire Trust: xx - ipfs: 22. The aricle can be found [here](https://twincitiesbusinessradio.com/content/all/biden-calls-trump-and-supporters-dregs-of-society )
+  * "Biden Calls Trump and Supporters “Dregs of Society”". **Bywire Trust: 22 - ipfs: . The aricle can be found [here](https://twincitiesbusinessradio.com/content/all/biden-calls-trump-and-supporters-dregs-of-society )
   * "Nancy Pelosi’s Son Was Exec At Gas Company That Did Business In Ukraine". **Bywire Trust: 14 - ipfs: **
 
 * Real News
@@ -89,4 +89,3 @@ Here are some examples of fake news stories and real news stories. The ipfs hash
   * Praise and condemnation for Iran's new hardline president. **Bywire Trust: 61 - ipfs **. The article can be found [here](https://www.reuters.com/world/middle-east/praise-disdain-irans-new-hardline-president-2021-06-19/)
 
 
-61
