@@ -40,58 +40,83 @@ class Model(object):
 		
 		platform	       = trust_article.platform if trust_article.platform in self.m_parameters else ModelConst.PLATFORM_ALL
 		parameters	       = self.m_parameters[platform]
-		a1  = parameters["sentiment_score"]["ci90"]
+		a1  = parameters["sentiment_score"]["ci50"]
 		b1  = parameters["sentiment_score"]["scale"]
-		a2  = parameters["sentiment_score2"]["ci90"]
-		b2  = parameters["sentiment_score2"]["scale"]
-		a3  = parameters["article_length"]["ci10"]
-		b3  = parameters["article_length"]["scale"]
-		a41 = parameters["complexity_punctuation"]["ci10"]
-		a42 = parameters["complexity_punctuation"]["ci90"]
-		a5  = parameters["complexity_word_length"]["ci10"]
-		a6  = parameters["complexity_complexity"]["ci10"]
-		a7  = parameters["complexity_duplication"]["ci10"]
-		a8  = min(parameters["sentiment_expertai_positive"]["ci90"], parameters["sentiment_expertai_negative"]["ci90"])
-		s91pos = parameters["sentiment_expertai_positive"]["ci90"]
-		s91neg = parameters["sentiment_expertai_negative"]["ci90"]
-		s91com = parameters["complexity_expertai"]["ci50"]
-		s92pos = parameters["sentiment_positive"]["ci90"]
-		s92neg = parameters["sentiment_negative"]["ci90"]
-		s92com = parameters["complexity_complexity"]["ci50"]
-		baserate = parameters["baserate"]
-		# Positive Divergence
-		if (trust_article.sentiment_expertai_positive >= 0):
-			div_pos = abs(trust_article.sentiment_expertai_positive/s91pos - trust_article.sentiment_positive/s92pos)
-		else:
-			div_pos = 0
-		# Negative Divergence
-		if (trust_article.sentiment_expertai_negative >= 0):
-			div_neg = abs(trust_article.sentiment_expertai_negative/s91neg - trust_article.sentiment_positive/s92neg)
-		else:
-			div_neg = 0
-		# Complexity Divergence
-		if (trust_article.complexity_expertai >= 0):
-			div_com = abs(trust_article.complexity_expertai/s91com - trust_article.complexity_complexity/s92com)
-					   
+		sentiment1 = (trust_article.sentiment_score - a1)/b1
+
+		a1  = parameters["sentiment_score2"]["ci90"]
+		b1  = parameters["sentiment_score2"]["scale"]
+		sentiment2 = (trust_article.sentiment_score2 - a1)/b1
+		
+		a1  = parameters["sentiment_expertai_positive"]["ci50"]
+		c1  = parameters["sentiment_expertai_positive"]["ci90"]
+		b1  = c1 - a1
+		euphoria_pos = (trust_article.sentiment_expertai_positive - a1)/b1
+
+		a1  = parameters["sentiment_expertai_negative"]["ci50"]
+		c1  = parameters["sentiment_expertai_negative"]["ci90"]
+		b1  = c1 - a1
+		euphoria_neg = (trust_article.sentiment_expertai_negative - a1)/b1
+		
+		euphoria     = max(euphoria_pos, euphoria_neg)
+		
+
+		a1  = parameters["article_length"]["ci10"]
+		b1  = parameters["article_length"]["scale"]
+		article_length = (a1 - trust_article.article_length)/b1
+
+		a1 = parameters["complexity_punctuation"]["ci10"]
+		a2 = parameters["complexity_punctuation"]["ci90"]
+		punctuation = 1 if (trust_article.complexity_punctuation < a1 or
+				    trust_article.complexity_punctuation > a2) else 0
+
+
+		a1  = parameters["complexity_complexity"]["ci10"]
+		complexity = 1 if (trust_article.complexity_complexity	< a1) else 0
+		
+		a1  = parameters["complexity_duplication"]["ci10"]
+		duplication = 1 if (trust_article.complexity_duplication < a1) else 0
+		
+		a1  = parameters["complexity_word_length"]["ci10"]
+		word_length = 1 if (trust_article.complexity_word_length < a1) else 0
+
+
+		b1 = parameters["sentiment_expertai_positive"]["ci90"]
+		b2 = parameters["sentiment_positive"]["ci90"]
+		divergency_pos = abs(trust_article.sentiment_expertai_positive/b1 - trust_article.sentiment_positive/b2)
+		
+		b1 = parameters["sentiment_expertai_negative"]["ci90"]
+		b2 = parameters["sentiment_negative"]["ci90"]
+		divergency_neg = abs(trust_article.sentiment_expertai_negative/b1 - trust_article.sentiment_negative/b2)
+
+		b1 = parameters["complexity_expertai"]["ci90"]
+		b2 = parameters["complexity_complexity"]["ci90"]
+		divergency_com = abs(trust_article.complexity_expertai/b1 - trust_article.complexity_complexity/b2)
+
+		divergency = max(divergency_pos, divergency_pos, divergency_com)
+
+		baserate   = parameters["baserate"]
 			
 		norm = lambda x: max(0, min(1, x))
-		record = {"sentiment":		    norm((trust_article.sentiment_score - a1)/b1),
-			  "sentiment2":		    norm((trust_article.sentiment_score2 - a2)/b2),
-			  "article_length":	    norm((a3 - trust_article.article_length)/b3),
-			  "punctuation": 1 if (trust_article.complexity_punctuation < a41 or
-					       trust_article.complexity_punctuation > a42) else 0,
-			  "complexity_complexity":  1 if (trust_article.complexity_complexity  < a6) else 0,
-			  "complexity_duplication": 1 if (trust_article.complexity_duplication < a7) else 0,
-			  "complexity_word_length": 1 if (trust_article.complexity_word_length < a5) else 0,
-			  "platform":	  1-baserate,
-			  "divergency":	  norm(max(div_pos, div_neg, div_com)),
-			  "author":	  0
+		record = {"sentiment":		    norm(sentiment1),
+			  "sentiment2":		    norm(sentiment2),
+			  "euphoria":		    norm(euphoria),
+			  "article_length":	    norm(article_length),
+			  "punctuation":	    punctuation,
+			  "complexity_complexity":  complexity,
+			  "complexity_duplication": duplication,
+			  "complexity_word_length": word_length,
+			  "platform":		    1-baserate,
+			  "divergency":		    norm(divergency),
+			  "author":		    0
 			  }
 		return record		     
 
 
 	def reasons(self, features):
 		reasons		       = []
+		if (features["euphoria"] > 0.5):
+			  reasons.append("The tone is euphoric/depressed")
 		if (features["punctuation"] > 0.5):
 			  reasons.append("Suspicious Puntuation")
 		if (features["sentiment"] > 0.5):

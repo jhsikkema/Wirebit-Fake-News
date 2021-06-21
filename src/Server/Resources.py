@@ -62,6 +62,8 @@ class AnalyzeQuery(Resource):
 			Log.info("AnalyzeQuery - Got Trust")
 			return {"id": id, "status": "Unknown Request", "done": True}, 200
 		msg = {"id": id, "status": "Done", "done": True, "data": trust.toJSON()}
+		for (key, value) in msg["data"].items():
+			msg["data"][key] = int(value) if isinstance(value, float) else value
 		if (id.startswith("IPFS_")):
 			article = Article.get(id)
 			msg["text"] = article.content
