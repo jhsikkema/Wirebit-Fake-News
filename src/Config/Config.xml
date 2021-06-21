@@ -2,12 +2,12 @@
   <database>
     <url> localhost </url>
     <port> 27017 </port>
-    <schema> bywire_trust </schema>
+    <schema> bywire_fake </schema>
   </database>
 
   <api>
     <expertai>
-      <use> False </use>
+      <use> True </use>
       <username> jetze@bywire.news </username>
       <password> Nel%mezz0! </password>
     </expertai>

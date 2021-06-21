@@ -17,14 +17,17 @@ class ModelHeuristic(Model):
 		super(ModelHeuristic, self).__init__(config)
 
 	def predict(self, features):
+		print(features)
+		Log.info(features)
 		norm	   = lambda x: 100*max(0, min(1, 1-x))
-		sentiment  = norm(features["sentiment2"])
-		layout	   = norm(1/2*(features["article_length"] + features["punctuation"]))
+		sentiment  = norm(0.75*features["sentiment2"]+0.75*features["euphoria"])
+		layout	   = norm(0.75*features["article_length"] + 0.75*features["punctuation"])
 		divergency = norm(features["divergency"])
-		complexity = norm(1/3*(features["complexity_complexity"] + features["complexity_duplication"] + features["complexity_word_length"]))
+		complexity = norm(0.5*features["complexity_complexity"] + 0.5*features["complexity_duplication"] + 0.5*features["complexity_word_length"])
 		platform   = norm(features["platform"])
 		author	   = norm(features["author"])
-		trust	   = (2*sentiment + complexity + layout + platform + divergency)/6
+		trust	   = (3*sentiment + complexity + layout + platform + divergency)/7
+		trust	   = max(1, 100+0.75*(sentiment-100) + 0.33*(complexity-100) + 0.33*(layout - 100) + 0.33*(platform-100) + 0.33*(divergency-100))
 		
 		record = {  "trust_score":	trust,
 			    "divergency_score": divergency,

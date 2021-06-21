@@ -46,8 +46,12 @@ class IPFSGateway(object):
 			headers = {'Content-type' : 'application/x-www-form-urlencoded'}
 			Log.info(url)
 			req = requests.post(url, data=None, headers=headers)
+			Log.info(req)
+			Log.info(dir(req))
+			Log.info(req.text)
+			Log.info(json.loads(req.text))
 			Log.info(req.json())
-			callback(req.json())
+			callback(json.loads(req.text))
 			#job = grequests.send(req, grequests.Pool(1))
 
 	def execute(self, command, args, file_data, callback):

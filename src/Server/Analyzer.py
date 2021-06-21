@@ -29,7 +29,8 @@ from IPFS.ipfs import IPFSGateway
 
 from Model.ModelFactory import ModelFactory
 from Model.ModelConst import ModelConst
-# Import according to the docs didn't work with the standard ubuntu installation. 
+# Import according to the docs didn't work with the standard ubuntu installation.
+from expertai.nlapi.cloud.client import ExpertAiClient
 from expertai.nlapi.common.errors import ExpertAiRequestError as ExpertAiRequestError
 
 class Analyzer(threading.Thread):
@@ -93,15 +94,18 @@ class Analyzer(threading.Thread):
 
 	def enrich(self, text):
 		if not(self.m_nlp_client):
-			return {"sentiment_expertai_postive":	 -1.0,
+			return {"sentiment_expertai_positive":	 -1.0,
 				  "sentiment_expertai_negative": -1.0,
 				  "complexity_expertai":	 -1.0}
 		sentiment_output   = self.send_to_api(text, 'en', 'sentiment')
-		complexity_output  = self.send_to_api(text, 'en', 'deep-linguistic-analysis')
-		print(complexity_output)
+		#complexity_output  = self.send_to_api(text, 'en', 'deep-linguistic-analysis')
+		#print(complexity_output)
 		try:
-			record = {"sentiment_expertai_postive":	 sentiment_output.sentiment.postive,
-				  "sentiment_expertai_negative": sentiment_output.sentiment.negative,
+			Log.info(dir(sentiment_output))
+			Log.info(dir(sentiment_output.sentiment))
+			Log.info(sentiment_output.sentiment)
+			record = {"sentiment_expertai_positive": sentiment_output.sentiment.positivity,
+				  "sentiment_expertai_negative": sentiment_output.sentiment.negativity,
 				  "complexity_expertai": 0.0}
 		except AttributeError as e:
 			traceback.print_tb()
@@ -208,7 +212,7 @@ class Analyzer(threading.Thread):
 		Log.info("ParseDocument", id, record)
 		article = Article.fromJSON(record)
 		article.flush()
-		self.analyse(article)
+		self.analyze(article)
 		Log.info("ParseDocument - Analysis Done", id, record)
 		request = Request.get(id)
 		request.delete()
