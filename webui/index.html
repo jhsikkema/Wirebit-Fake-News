@@ -106,12 +106,11 @@
       </svg>
 
     <main>
-        <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-
-                <span class="fs-4">Bywire News AI Tools</span>
-            </a>
-            <hr>
+      <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none noborder">
+          <span class="fs-4">Bywire News AI Tools</span>
+        </a>
+        <hr>
             <ul class="nav nav-pills flex-column mb-auto" id="bwTabs" role="tablist">
 
                 <li class="nav-item mt-3">
@@ -398,7 +397,7 @@
 
 
                     <div class="col p-2 mt-2">
-                        <h3 class="mb-3">Sentiment: <span id="trust_index">45</span></h3>
+                        <h3 class="mb-3">Sentiment: <span id="gauge-sentiment-label">45</span></h3>
 
                         <div class="gauge gauge--liveupdate" id="gauge-sentiment">
                             <div class="gauge__container">
@@ -420,7 +419,7 @@
                     </div>
 
                     <div class="col p-2 mt-2">
-                        <h3 class="mb-3">Author: <span id="trust_index">100</span></h3>
+                        <h3 class="mb-3">Author: <span id="gauge-author-label">100</span></h3>
                         <div class="gauge gauge--liveupdate" id="gauge-author">
                             <div class="gauge__container">
                                 <div class="gauge__marker"></div>
@@ -439,7 +438,7 @@
 
                     </div>
                     <div class="col p-2 mt-2">
-                        <h3 class="mb-3">Publishers: <span id="trust_index">100</span></h3>
+                        <h3 class="mb-3">Publishers: <span id="gauge-publisher-label">100</span></h3>
 
                         <div class="gauge gauge--liveupdate" id="gauge-publishers">
                             <div class="gauge__container">
@@ -635,7 +634,7 @@
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="basic-addon1">https://ipfs.io/ipfs/</span>
                                 <input type="text" class="form-control form-control-lg" id="ipfs-input" placeholder="Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu" aria-label="News Article URL" aria-describedby="basic-addon1">
-                                <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="FakeNewsAPI.submit_ipfs();">Download from Blockchain</button>
+                                <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="submit_ipfs();">Download from Blockchain</button>
 
                             </div>
                             <p>Enter the website text into the field below
@@ -717,57 +716,231 @@
                                     <a type="button" class="btn btn-primary btn-lg buttonResults" onclick="submit_text();">Begin Analysis</a>
                                 </div>
                             </div>
-
+                        </div>
+                    </div>
+		    
+                    <!--BEGIN RESULTS SECTION-->
+                    <div class="row hide-progress">
+                        <div class="col p-2 mt-2">
+                            <div id="myProgressIPFS">
+                                <div id="myBarIPFS"></div>
+                            </div>
 
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="tab-pane" id="messages" role="tabpanel" aria-labelledby="messages-tab">
-                <div class="container-fluid">
-                    <div class="row mt-3">
-                        <div class="col-12 p-4">
 
-
-
-                            <h1>Have you discovered fake news or informmation? </h1>
-                            <h2>Submit now and we can tesit it, if it is indeed fake news, we can mark it fake for others.</h2>
+                    <div class="row hide" id="resultsIPFS">
+                        <div class="col p-2 mt-2">
+                            <h1>Results</h1>
                             <hr />
+                        </div>
+                    </div>
+
+
+                    <div class="row hide mt-3">
+                        <div class="col-md-6 p-2">
+
+                            <h2 id="trustedOrNotIPFS"></h2>
+                            <h4><span id="inputArticleTitleOutputIPFS"></span></h4>
+                            <p id="openingAnalysisMessageIPFS"></p>
+                            <div id="messageResultsAnalIPFS">
+
+                            </div>
+                            <p id="warningFlagFakeDatabaseTrueIPFS"></p>
+                            <p class="lead"><span id="inputArticleAuthorOutputIPFS"></span> | <span id="inputArticlePublisherOutputIPFS"></span> </p>
 
 
                         </div>
+
+
+
+                        <div class="col-md-6 p-2">
+                            <div class="gauge gauge--liveupdate" id="gaugeIPFS">
+                                <div class="gauge__container">
+                                    <div class="gauge__marker"></div>
+                                    <div class="gauge__background"></div>
+                                    <div class="gauge__center"></div>
+                                    <div class="gauge__data"></div>
+                                    <div class="gauge__needle"></div>
+                                </div>
+                                <div class="gauge__labels mdl-typography__headline">
+                                    <span class="gauge__label--low">FAKE</span>
+                                    <span class="gauge__label--spacer"></span>
+                                    <span class="gauge__label--high">Genuine</span>
+                                </div>
+                            </div>
+                            <script src="material-gauge.js"></script>
+
+                            <h2 class="text-center">Trust Score: <span id="trust_indexIPFS"></span> </h2>
+                            <p class="text-center flags" onclick="submit_flag();">Flag as <span id="flagAsWhatIPFS"></span></p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="row hide">
+                    <div class="col p-2 ">
+
                     </div>
                 </div>
+                <div class="row mt-4 hide ">
+
+                    <div class="col-md-2 p-2 mt-2">
+
+                        <ul class="mt-5" id="trust_index_resultsIPFS">
+
+                        </ul>
+                    </div>
+
+                    <div class="col-md-1 p-2 mt-2"></div>
+
+                    <div class="col-md-9 p-2 mt-2" id="trustIndexContainerIPFS">
+
+
+
+                    </div>
+                </div>
+
+                <div class="row mt-5 hide text-center">
+
+
+
+                    <div class="col p-2 mt-2">
+                        <h3 class="mb-3">Sentiment: <span id="gauge-sentiment-labelIPFS">45</span></h3>
+
+                        <div class="gauge gauge--liveupdate" id="gauge-sentimentIPFS">
+                            <div class="gauge__container">
+                                <div class="gauge__marker"></div>
+                                <div class="gauge__background"></div>
+                                <div class="gauge__center"></div>
+                                <div class="gauge__data"></div>
+                                <div class="gauge__needle"></div>
+                            </div>
+                            <div class="gauge__labels mdl-typography__headline">
+                                <span class="gauge__label--low">Negative</span>
+                                <span class="gauge__label--spacer"></span>
+                                <span class="gauge__label--high">Positive</span>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="col p-2 mt-2">
+                        <h3 class="mb-3">Author: <span id="gauge-author-labelIPFS">100</span></h3>
+                        <div class="gauge gauge--liveupdate" id="gauge-authorIPFS">
+                            <div class="gauge__container">
+                                <div class="gauge__marker"></div>
+                                <div class="gauge__background"></div>
+                                <div class="gauge__center"></div>
+                                <div class="gauge__data"></div>
+                                <div class="gauge__needle"></div>
+                            </div>
+                            <div class="gauge__labels mdl-typography__headline">
+                                <span class="gauge__label--low">Caution</span>
+                                <span class="gauge__label--spacer"></span>
+                                <span class="gauge__label--high">Trustworthy</span>
+                            </div>
+                        </div>
+                        <p class="lead" id="authorNameGraphIPFS"></p>
+
+                    </div>
+                    <div class="col p-2 mt-2">
+                        <h3 class="mb-3">Publishers: <span id="gauge-publisher-labelIPFS">100</span></h3>
+
+                        <div class="gauge gauge--liveupdate" id="gauge-publishersIPFS">
+                            <div class="gauge__container">
+                                <div class="gauge__marker"></div>
+                                <div class="gauge__background"></div>
+                                <div class="gauge__center"></div>
+                                <div class="gauge__data"></div>
+                                <div class="gauge__needle"></div>
+                            </div>
+                            <div class="gauge__labels mdl-typography__headline">
+                                <span class="gauge__label--low">Caution</span>
+                                <span class="gauge__label--spacer"></span>
+                                <span class="gauge__label--high">Trustworthy</span>
+                            </div>
+                        </div>
+                        <p class="lead" id="publisherNameGraphIPFS"></p>
+                    </div>
+                </div>
+
+                <div class="row mt-4 hide">
+                    <div class="col-md-12 p-2 mt-2">
+
+
+                    </div>
+                </div>
+
+            </div>
+	    <div class="tab-pane" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+	      <div class="container">
+		<div class="row mt-3">
+                  <div class="col-12 p-4">
+                    <h1>Have you discovered fake news or disinformation? </h1>
+                    <hr />
+                    <p class="lead">You can help stop fake news spreading before it even thinks to get its socks on! </p>
+                    <p class="lead">The Bywire News Network publishes certificates for all content that runs on our network, and this certificate objectively informs the Reader if the news is genuine or fake.</p>
+                    <p class="lead">In addition, the quicker fake news is flaged via our
+                      <a href="/">Fake News Detector</a>, the quicker it is added to our RED LIST. This will help inform others that this information is indeed false. Bywire will also soon automatically publish this analysis to its website and
+                      blockchains, which will show up on Google in place of, or ranked in a more prominent search position, than the original fake/false story.</p>
+                    <h2 class="my-5">LIVE interative fake news and disinformation map - COMING SOON</h2>
+                    <img src="images/2014-05-06_09_44_53.gif" class="img-fluid"><br />
+                    <small>Sample animated gif taken from https://www.vox.com/a/internet-maps and is used for illustrative purposes only.</small>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="tab-pane" id="photos" role="tabpanel" aria-labelledby="photos-tab">
-                <div class="container-fluid">
-                    <div class="row mt-3">
-                        <div class="col-12 p-4">
-
-
-
-                            <h1>Is information on this meme/photo genuine or fake?</h1>
-                            <hr />
-
-
-                        </div>
+              <div class="container-fluid">
+                <div class="row mt-3">
+                  <div class="col-12 p-4">
+		    <h1 clas>Upload a meme (any photo with writing over it), to see if it is Fake or Not</h1>
+                    <hr />
+                    <h2 class="my-5">Upload your photo here:</h2>
+                    <div class="input-group mb-3" disabled>
+                      <input type="file" class="form-control" id="inputGroupFile02" disabled>
+                      <label class="input-group-text" for="inputGroupFile02">Upload</label>
                     </div>
+                    <h3 class="my-5">Sample Results</h3>
+                    <div class="row">
+                      <div class="col-md-5">
+                        <img src="images/fake-hiliary-meme.png" class="d-block mx-auto img-fluid">
+                      </div>
+                      <div class="col-md-5">
+                        <p class="text-center">Did we read this Okay? <a href="#">Yes</a> | <a href="#">No</a></p>
+                        <textarea class="form-control" placeholder="Leave a comment here" id="inputNewsArticle5" style="height: 200px" readonly>Luigi Amaretto shared Veska Jankova's post. 12 September at 18:18 . Veska Jankova shared a link to the group: Boycott Liberal Media. 12 September : 15:32 . Hiliary Clinton Attacks Women Who Didn't Vote for Her. In her new book "What happened," Hiliary Clinton attacks women who regretted not voting for  USAJUSTNOW.COM</textarea>
+                        <div class="mt-2 alert alert-danger d-flex align-items-center" role="alert"><svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                          <strong><h4 class="alert-heading">WARNING FAKE NEWS!</h4><p>Warning, this article has been discovered on the Bywire fake news database,
+                              and is listed and FAKE. </p></strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
             </div>
             <div class="tab-pane" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                <div class="container-fluid">
-                    <div class="row mt-3">
-                        <div class="col-12 p-4">
-                            <h1>Show your readers that your news is genuine</h1>
-                            <hr />
-                            <p class="lead">Bywire News is creating the new digital trust certification standard for news and content. Make use of our trust API and decentralised your content across blockchains, and show a certificate of trust to your readers.
+              <div class="container-fluid">
+                <div class="row mt-3">
+                  <div class="col-12 p-4">
+                    <div class="col-12 p-4">
+                      <h1>Show your readers that your news is genuine</h1>
+                      <hr />
+                      <p class="lead">Bywire News is creating the new digital trust certification standard for
+			news and content. Make use of our trust API and decentralised your content across blockchains, and show a certifica
+			te of trust to your readers.
 
-                            </p>
-                            <img src="cert-example.png">
-                        </div>
+                      </p>
+                      <img src="images/cert-example.png">
                     </div>
-                </div>
-            </div>
+                  </div>
+		</div>
+	      </div>
+	    </div>
             <div class="tab-pane" id="last" role="tabpanel" aria-labelledby="settings-tab">
                 <div class="container">
                     <div class="row mt-3">
@@ -984,10 +1157,11 @@
 
     <script>
         //Using jQuery for a quick rough word count, however this needs to be improved as there is a spacing bug, need to only count each space once, might be worth dropping jquer and just using js
-        $('#myText').on('keyup', function() {
-            var count = $('#myText').val().trim().split(' ');
+        $('#inputNewsArticle').on('keyup', function() {
+            var count = $('#inputNewsArticle').val().trim().split(' ');
             $('#wordCount').text(count.length);
         });
+
     </script>
 
 
@@ -1020,8 +1194,9 @@
                       current_id = id
                       if (id in requests) {
                           delete requests[data["id"]]
+			  var postfix = ("text" in data) ? "IPFS" : ""
                           if ("data" in data) {
-                              show_results(data["data"], "")
+                              show_results(data["data"], postfix)
                           }
                           if ("text" in data) {
                               FakeNewsAPI.show_text(data["text"])
@@ -1132,15 +1307,17 @@
             ]
         };
 
-      function show_results(resultsTemp, postfix) {
+      function show_results(results, postfix) {
+	  let resultsTemp = results
          //Labels for the HTML output of each parameter. Wanted to use varaibles to future proof changes. 
-          const trust_score_label = "Trust: ";
-          const sentiment_score_label = "Sentiment: ";
-          const layout_score_label = "Layout: ";
-          const divergency_score_label = "Divergence: ";
-          const complexity_score_label = "Complexity: ";
-          const author_score_label = "Author: ";
-          const platform_score_label = "Publisher: ";
+	  const labels = {"trust":   "Trust: ",
+			  "sentiment":  "Sentiment: ",
+			  "layout":     "Layout: ",
+			  "divergency": "Divergence: ",
+			  "complexity": "Complexity: ",
+			  "author":     "Author: ",
+			  "platform":   "Publisher: "
+			 }
           const space = " ";
           const genuine = "Genuine!";
           const fake = "WARNING FAKE NEWS!";
@@ -1149,7 +1326,7 @@
 
 	  
           //dummy variable to state that this seach, the object above has been flagged as being present, and fake, on the bywire fake or not database. I would have added it tot he object resultsTemp however it would mess up my array slicing
-          let isStoredFakeNewsDatabase = true;
+          let isStoredFakeNewsDatabase = results["trust_score"] <= 50;
 
           const genuineMessage1 = "Although this article has been analysed as likely to be genuine, there is more information below which you may find helpful in assisting you to come to your own conclusion";
           const fakeMessage1 = "This article is highly unlikely to be genuine, and it could be entirely fake. Below are a set of parameters which highlight how we came to this consideration.";
@@ -1161,7 +1338,7 @@
           const complexity_word_length_label_message = "The complexity of the language used in this article seems to be overly simplistic. News stories that make bold claims would rarely provide little supporting information if those claims are genuine. Therefore, if this story is making big, bold claims and is more than a few hours old, and has been written with little substance, then this is almost certainly fake news. ";
           const complexity_duplication_label_message = "There appears to be an overuse of repetition in this article. A classic technique of fake news is to bulk out an article, to make it look more genuine, by effectively repeating the same thing over and over, with the use of different words and sentences. ";
           const complexity_complexity_label_message = "This article has been flagged as containing suspicious words. Professional news outlets are unlikely to include these words in their reporting, therefore this may be fake. However, please caution, as this may have been flagged out of context. Additional, quotes may have been mislabelled by the author, and therefore may have been incorrectly flagged in this warning. ";
-          const divergency_label_message = "The Bywire AI fake news detective is powered by two algorithms. The first is the Bywire algorithm, and the second has been kindly provided by Express.AI. Should both these algorithms be unable to find a consensus, this warning will be flagged. Please take additional caution with this article as our tools have been unable to reach a confident consensus, i.e., we just do not know if this is genuine or not, therefore we have flagged it for human intervention. ";
+          const divergency_label_message = "The Bywire AI fake news detective is powered by two algorithms. The first is the Bywire algorithm, and the second has been kindly provided by ExpertAI. Should both these algorithms be unable to find a consensus, this warning will be flagged. Please take additional caution with this article as our tools have been unable to reach a confident consensus, i.e., we just do not know if this is genuine or not, therefore we have flagged it for human intervention. ";
 
           const mapping = {
               "The tone is euphoric/depressed": euphoria_label_message,
@@ -1174,24 +1351,20 @@
               "Suspicious Incompatability between algorithms": divergency_label_message
           };
 
-          //document.write(resultsTemp["reasons"].join(' '));
-          let lengthOfReasons = resultsTemp["reasons"].length;
+          //document.write(results["reasons"].join(' '));
+          let lengthOfReasons = results["reasons"].length;
 
           //This will print out the correct messages while mapping them
           let reasonMessages = [];
 
-          resultsTemp["reasons"].forEach(item => {
+          results["reasons"].forEach(item => {
               let newReason = mapping[item];
               reasonMessages.push("<p>" + newReason + "</p>");
           });
 
-          //The array printed out the comma, so this removes it
-          let removeComma = () => {
-              reasonMessages = reasonMessages.join(' '); // using join() method.
-          }
-          removeComma();
+          reasonMessages = reasonMessages.join(' '); // using join() method.
           //print out the final error messages
-          document.getElementById("messageResultsAnal").innerHTML = reasonMessages;
+          document.getElementById("messageResultsAnal"+postfix).innerHTML = reasonMessages;
 	  
       
 
@@ -1207,47 +1380,41 @@
 
           //This is the basic method to print out the results on the page from each child element of the results object. This could be changed into a loop
 
-          let trustIndexNew = Object.values(resultsTemp)
-
-          //this removes the first two elements of the trusted indec array as we don't want to display them
-	  trustIndexNew.splice(0, 2)
-      
-          //this removes the last element of the array, which we are currently displaying in a different way, will come back to this and improve.
-          trustIndexNew.pop();
-      
-      
-
           //I have retrofitted these graphs at this point in the dom so they can populate the gauges, before these values are removed from the array for displaying purposes. Should rethink this, change the headers of each gauge into the array items, headings (keys) & values.
           //This will also act as a checksum for the guage output, althopugh it has been manually checked in the console
 
           //Sentiment Gauge
-          var sentimentGauge = new Gauge(document.getElementById("gauge-sentiment"));
-          sentimentGauge.value(trustIndexNew[1] / 100);
+          var sentimentGauge = new Gauge(document.getElementById("gauge-sentiment"+postfix));
+          sentimentGauge.value(results["sentiment_score"] / 100);
+          document.getElementById("gauge-sentiment-label"+postfix).innerHTML = results["sentiment_score"]
           //Author Gauge
-          var authorGauge = new Gauge(document.getElementById("gauge-author"));
-          authorGauge.value(trustIndexNew[5] / 100);
+          var authorGauge = new Gauge(document.getElementById("gauge-author"+postfix));
+          authorGauge.value(results["author_score"] / 100);
+          document.getElementById("gauge-author-label"+postfix).innerHTML = results["author_score"]
           //Publisher Gauge
-          var publisherGauge = new Gauge(document.getElementById("gauge-publishers"));
-          publisherGauge.value(trustIndexNew[6] / 100);
+          var publisherGauge = new Gauge(document.getElementById("gauge-publishers"+postfix));
+          publisherGauge.value(results["platform_score"] / 100);
+          document.getElementById("gauge-publisher-label"+postfix).innerHTML = results["platform_score"]
 	  
-          //Removing the authors and publishers from the array 
-          trustIndexNew.splice(4, 2);
 	  
           //setting a custom variable for the bar chart results to include different entires
-          let resultsForBarGraph = Object.values(trustIndexNew);
+          let resultsForBarGraph = [results["sentiment_score"],
+				    results["layout_score"],
+				    results["divergency_score"],
+				    results["complexity_score"]]
+          let labelsForBarGraph =  [labels["sentiment"],
+				    labels["layout"],
+				    labels["divergency"],
+				    labels["complexity"]]
 	  
-          //Removing the first entry from the bar chart output as we do not need to display it here
-          resultsForBarGraph.shift()
-
-      
 
           //this creates a new lists and stores the UL html
-          let list = document.getElementById("trust_index_results");
+          let list = document.getElementById("trust_index_results"+postfix);
 
           //This is the Gauge for the Fake or Genuine graph 
-          var gauge = new Gauge(document.getElementById("gauge"));
+          var gauge = new Gauge(document.getElementById("gauge"+postfix));
           //I am just dividing by 100 to turn it into a score out of 0-1 (percent)
-          gauge.value(trustIndexNew[0] / 100);
+          gauge.value(results["trust_score"] / 100);
 
 
 
@@ -1255,14 +1422,10 @@
 
           //Here we are relabelling each value in our array with the correct labels. This is much better than creating the html elements. Again, I should now put the labels into an object or array and loop over
 
-          trustIndexNew.shift(); //Removing the first item of the array, as we no longer need to display the trust score. Therefore, removing it before I build the UL 
-
-          trustIndexNew[0] = sentiment_score_label + trustIndexNew[0];
-          trustIndexNew[1] = layout_score_label + trustIndexNew[1];
-          trustIndexNew[2] = divergency_score_label + trustIndexNew[2];
-          trustIndexNew[3] = complexity_score_label + trustIndexNew[3];
-          //trustIndexNew[4] = author_score_label + trustIndexNew[4];
-          //trustIndexNew[5] = platform_score_label + trustIndexNew[5];
+          let trustIndexNew = [labels["sentiment"] + results["sentiment_score"],
+			       labels["layout"] + results["layout_score"],
+			       labels["divergency"] + results["divergency_score"],
+			       labels["complexity"] + results["complexity_score"]]
 
           //this functions adds in the entries of the key value pairs from our new trust index array new which temp stores the results 
           trustIndexNew.forEach((item) => {
@@ -1274,23 +1437,23 @@
 
 
           //Display the total trust score, and the total amount out of, which is a variable based on inputs, commented above.
-          document.getElementById("trust_index").innerHTML = resultsTemp["trust_score"] + space + "out of" + space + maxScore;
+          document.getElementById("trust_index"+postfix).innerHTML = results["trust_score"] + space + "out of" + space + maxScore;
 
 
           //Converting the Results Objects into a values array, to use in the charts
           const resultsValues = (Object.values(resultsTemp));
 
           //CHART.JS
-          let container = document.getElementById('trustIndexContainer')
+          let container = document.getElementById('trustIndexContainer'+postfix)
 	  
-	  $('#trustIndexChart').remove(); // this is my <canvas> element
-	  $('#trustIndexContainer').append('<canvas id="trustIndexChart" width="100%" height="50%"></canvas>')
+	  $('#trustIndexChart'+postfix).remove(); // this is my <canvas> element
+	  $('#trustIndexContainer'+postfix).append('<canvas id="trustIndexChart'+postfix+'" width="100%" height="50%"></canvas>')
 	  
-          let ctx = document.getElementById('trustIndexChart')
+          let ctx = document.getElementById('trustIndexChart'+postfix)
           var myChart = new Chart(ctx, {
               type: 'bar',
               data: {
-                  labels: [sentiment_score_label, layout_score_label, divergency_score_label, complexity_score_label],
+                  labels: labelsForBarGraph,
                   datasets: [{
                       label: 'Trust Index out of 100',
                       data: resultsForBarGraph,
@@ -1390,22 +1553,21 @@
 
 
 
-          document.getElementById("trustedOrNot").innerHTML = displayResults(resultsTemp["trust_score"]);
+          document.getElementById("trustedOrNot"+postfix).innerHTML = displayResults(resultsTemp["trust_score"]);
 	  
-          document.getElementById("flagAsWhat").innerHTML = flag;
+          document.getElementById("flagAsWhat"+postfix).innerHTML = flag;
 
 	  
 	  function showOpeningReasonsMessage() {
               if (lengthOfReasons > 0) {
-		  document.getElementById("openingAnalysisMessage").innerHTML = openingAnalysisMessage;
+		  document.getElementById("openingAnalysisMessage"+postfix).innerHTML = openingAnalysisMessage;
               }
 	  }
 	  
 	  showOpeningReasonsMessage();
           function fakeNewsDatabase() {
-	      return;
               if (isStoredFakeNewsDatabase == true) {
-                  document.getElementById("warningFlagFakeDatabaseTrue").innerHTML = '<div class="alert alert-danger d-flex align-items-center" role="alert">' + '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg> Warning, this article has been discovered on the Bywire fake news database, and is listed and FAKE. </div>'
+                  document.getElementById("warningFlagFakeDatabaseTrue"+postfix).innerHTML = '<div class="alert alert-danger d-flex align-items-center" role="alert">' + '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg> Warning, this article has been discovered on the Bywire fake news database, and is listed and FAKE. </div>'
               }
           }
       
@@ -1434,7 +1596,7 @@
             $(".hide-progress").toggleClass("hide-progress");
         }
 
-        let progressTemp = document.getElementById("myProgress");
+
 
 
 
@@ -1449,12 +1611,22 @@
       var api = new FakeNewsAPI()
 
         function submit_text() {
+	    let progressTemp = document.getElementById("myProgress");
             const inputTitle = document.getElementById("inputTitle").value;
             const inputWebsite = document.getElementById("inputWebsite").value;
             const inputAuthor = document.getElementById("inputAuthor").value;
             const inputPublisher = document.getElementById("inputPublisher").value;
             const inputNewsArticle = document.getElementById("inputNewsArticle").value;
+            function strip(string) {
+		return string.replace(/^\s+|\s+$/g, '');
+            }
+	    const emptyMessage = "Please enter an article"
+	    if (strip(inputNewsArticle) === "" || strip(inputNewsArticle) === emptyMessage) {
+		document.getElementById("inputNewsArticle").value = emptyMessage
+		return
+	    }
 
+	    
             function Fakeornot(title, website, author, publisher, content) {
                 this.searchTitle = title;
                 this.searchWebsite = website;
@@ -1462,7 +1634,7 @@
                 this.searchPublisher = publisher;
                 this.searchContent = content;
             }
-
+	    
             const newSeach = new Fakeornot(inputTitle, inputWebsite, inputAuthor, inputPublisher, inputNewsArticle);
 	    FakeNewsAPI.submit_text(inputNewsArticle, inputTitle, inputAuthor, inputPublisher)
 
@@ -1475,9 +1647,6 @@
 
             document.getElementById("authorNameGraph").innerHTML = newSeach.searchAuthor;
             document.getElementById("publisherNameGraph").innerHTML = newSeach.searchPublisher;
-
-
-
 
 
             showHideProgress();
@@ -1493,7 +1662,7 @@
                         clearInterval(id);
                         i = 0;
                         showHide();
-                        scrollBottom();
+                        scrollBottom("");
                     } else {
                         width++;
                         elem.style.width = width + "%";
@@ -1502,6 +1671,36 @@
             }
         };
 
+      function submit_ipfs() {
+	  var hash = document.getElementById("ipfs-input").value
+	  if (hash === "") {
+	      return
+	  }
+	  let progressTemp = document.getElementById("myProgressIPFS");
+	  FakeNewsAPI.submit_ipfs(hash)
+          showHideProgress();
+
+          progressTemp.scrollIntoView();
+          if (i == 0) {
+              i = 1;
+              var elem = document.getElementById("myBarIPFS");
+              var width = 1;
+              var id = setInterval(frameIPFS, 5);
+
+              function frameIPFS() {
+                  if (width >= 100) {
+                      clearInterval(id);
+                      i = 0;
+                      showHide();
+                      scrollBottom("IPFS");
+                  } else {
+                      width++;
+                      elem.style.width = width + "%";
+                  }
+                }
+            }
+      };
+
       var examples = [];
 
       $('#simDataListIPFS').change(function() {
@@ -1509,9 +1708,9 @@
 	  var val = $(this).val()
 	  for (var key in examples) {
 	      if (examples[key]["key"] === val) {
-		  document.getElementById("ipfs-input").innerHTML = examples[key]["ipfs"]
+		  document.getElementById("ipfs-input").value = examples[key]["ipfs"]
 		  if (examples[key]["ipfs"]) {
-		      FakeNewsAPI.submit_ipfs(examples[key]["ipfs"])
+		      submit_ipfs()
 		  }
 	      }
 	  }
@@ -1526,6 +1725,8 @@
 		  document.getElementById("inputAuthor").value      = examples[key]["author"];
 		  document.getElementById("inputPublisher").value   = examples[key]["publisher"];
 		  document.getElementById("inputNewsArticle").value = examples[key]["article_content"];
+		  var count = $('#inputNewsArticle').val().trim().split(' ');
+		  $('#wordCount').text(count.length);
 		  submit_text();
 	      }
 	  }
@@ -1565,10 +1766,10 @@
 
 
     <script>
-        function scrollBottom() {
+        function scrollBottom(postfix) {
             setTimeout(function() {
                     //window.scrollTo(0, document.body.scrollHeight);
-                    let element = document.getElementById("results");
+                    let element = document.getElementById("results"+postfix);
                     element.scrollIntoView();
                 },
                 200

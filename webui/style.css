@@ -3,6 +3,7 @@ body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
     font-family: 'Open Sans', sans-serif;
+    line-height: 200%;
 }
 
 html {
@@ -28,6 +29,20 @@ main {
     height: -webkit-fill-available;
     overflow-x: auto;
     overflow-y: hidden;
+}
+
+a {
+    color: #9901AF;
+    border-bottom: 1px solid #9901AF;
+    text-decoration: none;
+}
+
+p a {
+    padding-bottom: 3px;
+}
+
+a.noborder {
+    border: none;
 }
 
 .b-example-divider {
@@ -176,6 +191,21 @@ main {
 }
 
 #trust_index_results {
+    font-size: 1.2em;
+}
+
+#myProgressIPFS {
+    width: 100%;
+    background-color: #ddd;
+}
+
+#myBarIPFS {
+    width: 1%;
+    height: 30px;
+    background-color: #741b81;
+}
+
+#trust_index_resultsIPFS {
     font-size: 1.2em;
 }
 

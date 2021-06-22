@@ -29,7 +29,7 @@ Corrie O'Connor",
        "article_content"=>"News outlets around the world are reporting on the news that Pope Francis has made the unprecedented decision to endorse a US presidential candidate. His statement in support of Donald Trump was released from the Vatican this evening:
 
 “I have been hesitant to offer any kind of support for either candidate in the US presidential election but I now feel that to not voice my concern would be a dereliction of my duty as the Holy See.",
-       "ipfs"=>"QmbKYe23oNfZF68srw2gmC5wzB5A4ZCywQTWf9VMkCDkLj",
+       "ipfs"=>"",
        "fake"=>True),
        array("title"=>"Nancy Pelosi’s Son Was Exec At Gas Company That Did Business In Ukraine",
        "author"=>"",
