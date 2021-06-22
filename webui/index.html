@@ -1169,8 +1169,8 @@
     <script>
 
       function submit_flag() {
-	  alert("Thank you for submitting your feedback!")
 	  FakeNewsAPI.submit_flag()
+      	  alert("Thank you for submitting your feedback!")
 	  scrollTop("")
 
       }
@@ -1192,6 +1192,10 @@
 
           static check_api(data) {
               var id = data["id"]
+	      if ("flagged" in data) {
+		  return
+	      }
+		  
               if ("new" in data && data["new"]) {
                   current_id = id
                   requests[id] = {}
@@ -1230,7 +1234,7 @@
                   "is_expert": false,
                   "strength": strength
               }
-              //FakeNewsAPI.send_to_api("flag", data, FakeNewsAPI.check_api)
+              FakeNewsAPI.send_to_api("flag", data, FakeNewsAPI.check_api)
           }
 
           static submit_ipfs(hash) {
