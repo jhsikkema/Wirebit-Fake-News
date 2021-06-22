@@ -914,8 +914,7 @@
                         <p class="text-center">Did we read this Okay? <a href="#">Yes</a> | <a href="#">No</a></p>
                         <textarea class="form-control" placeholder="Leave a comment here" id="inputNewsArticle5" style="height: 200px" readonly>Luigi Amaretto shared Veska Jankova's post. 12 September at 18:18 . Veska Jankova shared a link to the group: Boycott Liberal Media. 12 September : 15:32 . Hiliary Clinton Attacks Women Who Didn't Vote for Her. In her new book "What happened," Hiliary Clinton attacks women who regretted not voting for  USAJUSTNOW.COM</textarea>
                         <div class="mt-2 alert alert-danger d-flex align-items-center" role="alert"><svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-                          <strong><h4 class="alert-heading">WARNING FAKE NEWS!</h4><p>Warning, this article has been discovered on the Bywire fake news database,
-                              and is listed and FAKE. </p></strong>
+                          <strong><h4 class="alert-heading">WARNING FAKE NEWS!</h4><p>Warning! This article has been discovered on the Bywire fake news database! </p></strong>
                         </div>
                       </div>
                     </div>
@@ -1158,6 +1157,8 @@
     <script>
         //Using jQuery for a quick rough word count, however this needs to be improved as there is a spacing bug, need to only count each space once, might be worth dropping jquer and just using js
         $('#inputNewsArticle').on('keyup', function() {
+		
+	    document.getElementById("inputNewsArticle").style.color="black";
             var count = $('#inputNewsArticle').val().trim().split(' ');
             $('#wordCount').text(count.length);
         });
@@ -1630,6 +1631,7 @@
 	    const emptyMessage = "Please enter an article"
 	    if (strip(inputNewsArticle) === "" || strip(inputNewsArticle) === emptyMessage) {
 		document.getElementById("inputNewsArticle").value = emptyMessage
+		document.getElementById("inputNewsArticle").style.color="red";
 		return
 	    }
 
