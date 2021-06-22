@@ -144,7 +144,6 @@ class Model(object):
 		trust["param_version"] = self.m_param_version
 		trust["reasons"]       = self.reasons(features)
 
-		trust["trust_score"] = max(51, trust["trust_score"]) if trust_article.platform == "bywire" else trust["trust_score"]
 		trust = Trust.fromJSON(trust)
 		trust.flush()
 		return trust
