@@ -29,7 +29,7 @@ class ModelANN(Model):
 		
 	def create(self):
 		self.m_model = Sequential()
-		layers	     = self.m_config[ModelConst.ANN_LAYERS]
+		layers	     = self.m_config[ModelConst.ANN_LAYERS].split("|")
 		self.m_model.add(Dense(int(layers[0]), input_dim=8, activation='relu'))
 		for layer in layers[1:]:
 			self.m_model.add(Dense(int(layer), activation='relu'))
@@ -53,12 +53,14 @@ class ModelANN(Model):
 	def train(self):
 		X = []
 		Y = []
-		for item in Article.all():
-				trust	 = TrustArticle.get(item.id)
-				flag	 = self.flagged(item.id)
-				features = self.features(trust)
-				X.append([features[key] for key in self.m_columns])
-				Y.append(flag)
+		for (i, item) in enumerate(Article.all()):
+			trust	 = TrustArticle.get(item["id"])
+			if not(trust):
+				continue
+			flag	 = self.flagged(item["id"])
+			features = self.features(TrustArticle.fromJSON(trust))
+			X.append([features[key] for key in self.m_columns])
+			Y.append(flag)
 		X = np.array(X)
 		Y = np.array(Y)
 
@@ -77,9 +79,10 @@ class ModelANN(Model):
 				
 	def load(self):
 		# load json and create model
-		with open(self.m_model_path, 'r') as infile:
-			model_json = infile.read()
-			self.m_model = model_from_json(model_json)
-		self.m_model.load_weights(self.m_coeff_path)
-		self.m_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+		if (os.path.exists(self.m_model_path) and os.path.exists(self.m_coeff_path)):
+			with open(self.m_model_path, 'r') as infile:
+				model_json = infile.read()
+				self.m_model = model_from_json(model_json)
+			self.m_model.load_weights(self.m_coeff_path)
+			self.m_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 		

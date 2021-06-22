@@ -80,7 +80,7 @@ The following are very much for development purposes.
 Here are some examples of fake news stories and real news stories. The ipfs hashes you can use to load the stories into the Bywire Disinformation Detector are added. The fake news stories were the first ones to appear on a google search for fake news. The real news stories were the first stories that appeared in the guardian, bbc and bywire on the 18th of June. However we expect the algorithm to not always work this good as these were our first trials.
 * Fake News
   * "Pope Franciscus endorses Donald trump". **Bywire Trust 1 - ipfs:**. A discussion of this article can be found [here](https://www.buzzfeednews.com/article/craigsilverman/the-strangest-fake-news-empire) and [here](https://www.snopes.com/fact-check/pope-francis-donald-trump-endorsement/)
-  * "Biden Calls Trump and Supporters “Dregs of Society”". **Bywire Trust: 22 - ipfs:**. The aricle can be found [here](https://twincitiesbusinessradio.com/content/all/biden-calls-trump-and-supporters-dregs-of-society )
+  * "Biden Calls Trump and Supporters “Dregs of Society”". **Bywire Trust: 27 - ipfs:**. The aricle can be found [here](https://twincitiesbusinessradio.com/content/all/biden-calls-trump-and-supporters-dregs-of-society )
   * "Nancy Pelosi’s Son Was Exec At Gas Company That Did Business In Ukraine". **Bywire Trust: 14 - ipfs:**. A discussion can be found [here](https://eu.usatoday.com/story/news/factcheck/2021/02/05/fact-check-2019-meme-falsely-links-politicians-sons-work-ukraine/4341444001/)
 
 * Real News
