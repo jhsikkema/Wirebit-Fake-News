@@ -163,401 +163,370 @@
         </div>
         <div class="b-example-divider"></div>
 
-
         <!-- Tab panes -->
         <div class="tab-content">
 
-            <div class="tab-pane active" id="welcome" role="tabpanel" aria-labelledby="welcome-tab">
+          <div class="tab-pane active" id="welcome" role="tabpanel" aria-labelledby="welcome-tab">
 
-                <div class="container">
-                    <div class="row mt-3">
-                        <div class="col-12 p-2 submissionForm">
+            <div class="container">
+              <div class="row mt-3">
+                <div class="col-12 p-2 submissionForm">
+			  
+                  <h1>Is this News Fake or Genuine?</h1>
+                  <hr />
+                  <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Hackathon only!</h4>
+                    <label for="simDataList" class="form-label">Simulate Results</label>
+                    <input class="form-control" list="datalistOptions" id="simDataList" placeholder="Examples of Fake and Real News">
+                    <datalist id="datalistOptions">
+		    </datalist>
+                  </div>
+		  
 
-                            <h1>Is this News Fake or Genuine?</h1>
-                            <hr />
-                            <div class="alert alert-info" role="alert">
-                                <h4 class="alert-heading">Hackathon only!</h4>
-                                <label for="simDataList" class="form-label">Simulate Results</label>
-                                <input class="form-control" list="datalistOptions" id="simDataList" placeholder="Examples of Fake and Real News">
-                                <datalist id="datalistOptions">
-				</datalist>
-                            </div>
-
-
-                            <div class="row">
-                                <div class="col-md-6">
-
-                                    <div class="mb-3">
-                                        <label for="inputTitle" class="form-label">Enter the Article Title</label>
-                                        <input type="text" class="form-control" id="inputTitle" placeholder="Pope Francis Shocks World, Endorses Donald Trump for President
-                                ">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="inputWebsite" class="form-label">Website URL</label>
-                                        <input type="text" class="form-control" id="inputWebsite" placeholder="https://tatersgonnatate.com/nyc-coroner-that-declared-epsteins-death-suicide-was-on-clinton-foundation-payroll-until-2015/
-                                        ">
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="inputAuthor" class="form-label">Enter the Article Author if known</label>
-                                        <input type="text" class="form-control" id="inputAuthor" placeholder="Joe Bloggs
-                                        ">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="inputPublisher" class="form-label">Publisher</label>
-                                        <input type="text" class="form-control" id="inputPublisher" placeholder="BBC, CNN, WTOE 5, Guardian, The Times etc
-                                        ">
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-
-
-                            <p>Enter the website text into the field below
-                            </p>
-                            <div class="form-floating">
-                                <textarea class="form-control" placeholder="Leave a comment here" id="inputNewsArticle" style="height: 300px"></textarea>
-                                <label for="inputNewsArticle">News Article</label>
-                                <span id="wordCount">0</span> Words
-                            </div>
-
-                            <div class="form-check form-check-inline mt-2">
-                                <fieldset disabled>
-                                    <input class="form-check-input disabled" type="checkbox" id="fakeornot" value="fakeornot" checked>
-                                    <label class="form-check-label" for="fakeornot">Fake or Genuine?</label>
-                                </fieldset>
-                            </div>
-
-                            <div class="form-check form-check-inline mt-2">
-                                <fieldset disabled>
-                                    <input class="form-check-input disabled" type="checkbox" id="inlineCheckbox1" value="option1" checked>
-                                    <label class="form-check-label" for="inlineCheckbox1">Sentiment scores</label>
-                                </fieldset>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="layoutAnalysis" value="option2" checked>
-                                    <label class="form-check-label" for="layoutAnalysis">Layout analysis</label>
-                                </fieldset>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="divergenceAnalysis" value="option2" checked>
-                                    <label class="form-check-label" for="divergenceAnalysis">Divergence</label>
-                                </fieldset>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="complexityAnalysis" value="option2" checked>
-                                    <label class="form-check-label" for="complexityAnalysis">Complexity</label>
-                                </fieldset>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3" checked>
-                                    <label class="form-check-label" for="inlineCheckbox3">Author score</label>
-                                </fieldset>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox4" value="option4" checked>
-                                    <label class="form-check-label" for="inlineCheckbox4">Publisher score</label>
-                                </fieldset>
-                            </div>
-
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox5" value="option5">
-                                    <label class="form-check-label" for="inlineCheckbox5">Political bias</label>
-                                </fieldset>
-                            </div>
-
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox6" value="option6">
-                                    <label class="form-check-label" for="inlineCheckbox6">Originality</label>
-                                </fieldset>
-                            </div>
-
-                            <div class="form-check form-check-inline">
-                                <fieldset disabled>
-                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox6" value="option6">
-                                    <label class="form-check-label" for="inlineCheckbox6">History</label>
-                                </fieldset>
-                            </div>
-
-
-                        </div>
+                  <div class="row">
+                    <div class="col-md-6">
+		      
+                      <div class="mb-3">
+                        <label for="inputTitle" class="form-label">Enter the Article Title</label>
+                        <input type="text" class="form-control" id="inputTitle" placeholder="Pope Francis Shocks World, Endorses Donald Trump for President">
+                      </div>
                     </div>
-                    <div class="row submissionForm">
-                        <div class="col p-2 mt-2">
-                            <a type="button" class="btn btn-primary btn-lg buttonResults" onclick="submit_text();">Begin Analysis</a>
-                        </div>
+		    
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="inputWebsite" class="form-label">Website URL</label>
+                        <input type="text" class="form-control" id="inputWebsite" placeholder="https://tatersgonnatate.com/nyc-coroner-that-declared-epsteins-death-suicide-was-on-clinton-foundation-payroll-until-2015/">
+                      </div>
                     </div>
+		    
+                  </div>
 
-
-                    <!--BEGIN RESULTS SECTION-->
-                    <div class="row hide-progress">
-                        <div class="col p-2 mt-2">
-                            <div id="myProgress">
-                                <div id="myBar"></div>
-                            </div>
-
-                        </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="inputAuthor" class="form-label">Enter the Article Author if known</label>
+                        <input type="text" class="form-control" id="inputAuthor" placeholder="Joe Bloggs">
+                      </div>
                     </div>
-
-                    <div class="row hide" id="results">
-                        <div class="col p-2 mt-2">
-                            <h1>Results</h1>
-                            <hr />
-                        </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="inputPublisher" class="form-label">Publisher</label>
+                        <input type="text" class="form-control" id="inputPublisher" placeholder="BBC, CNN, WTOE 5, Guardian, The Times etc">
+                      </div>
                     </div>
+                  </div>
+                  <p>Enter the website text into the field below</p>
+                  <div class="form-floating">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="inputNewsArticle" style="height: 300px"></textarea>
+                    <label for="inputNewsArticle">News Article</label>
+                    <span id="wordCount">0</span> Words
+                  </div>
 
+                  <div class="form-check form-check-inline mt-2">
+                    <fieldset disabled>
+                      <input class="form-check-input disabled" type="checkbox" id="fakeornot" value="fakeornot" checked>
+                      <label class="form-check-label" for="fakeornot">Fake or Genuine?</label>
+                    </fieldset>
+                  </div>
 
-                    <div class="row hide mt-3">
-                        <div class="col-md-6 p-2">
-
-                            <h2 id="trustedOrNot"></h2>
-                            <h4><span id="inputArticleTitleOutput"></span></h4>
-                            <p id="openingAnalysisMessage"></p>
-                            <div id="messageResultsAnal">
-
-                            </div>
-                            <p id="warningFlagFakeDatabaseTrue"></p>
-                            <p class="lead"><span id="inputArticleAuthorOutput"></span> | <span id="inputArticlePublisherOutput"></span> </p>
-
-
-                        </div>
-
-
-
-                        <div class="col-md-6 p-2">
-                            <div class="gauge gauge--liveupdate" id="gauge">
-                                <div class="gauge__container">
-                                    <div class="gauge__marker"></div>
-                                    <div class="gauge__background"></div>
-                                    <div class="gauge__center"></div>
-                                    <div class="gauge__data"></div>
-                                    <div class="gauge__needle"></div>
-                                </div>
-                                <div class="gauge__labels mdl-typography__headline">
-                                    <span class="gauge__label--low">FAKE</span>
-                                    <span class="gauge__label--spacer"></span>
-                                    <span class="gauge__label--high">Genuine</span>
-                                </div>
-                            </div>
-                            <script src="material-gauge.js"></script>
-
-                            <h2 class="text-center">Trust Score: <span id="trust_index"></span> </h2>
-                            <p class="text-center flags" onclick="submit_flag();">Flag as <span id="flagAsWhat"></span></p>
-                        </div>
-                    </div>
+                  <div class="form-check form-check-inline mt-2">
+                    <fieldset disabled>
+                      <input class="form-check-input disabled" type="checkbox" id="inlineCheckbox1" value="option1" checked>
+                      <label class="form-check-label" for="inlineCheckbox1">Sentiment scores</label>
+                    </fieldset>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="layoutAnalysis" value="option2" checked>
+                      <label class="form-check-label" for="layoutAnalysis">Layout analysis</label>
+                    </fieldset>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="divergenceAnalysis" value="option2" checked>
+                      <label class="form-check-label" for="divergenceAnalysis">Divergence</label>
+                    </fieldset>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="complexityAnalysis" value="option2" checked>
+                      <label class="form-check-label" for="complexityAnalysis">Complexity</label>
+                    </fieldset>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3" checked>
+                      <label class="form-check-label" for="inlineCheckbox3">Author score</label>
+                    </fieldset>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="inlineCheckbox4" value="option4" checked>
+                      <label class="form-check-label" for="inlineCheckbox4">Publisher score</label>
+                    </fieldset>
+                  </div>
+		  
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="inlineCheckbox5" value="option5">
+                      <label class="form-check-label" for="inlineCheckbox5">Political bias</label>
+                    </fieldset>
+                  </div>
+		  
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="inlineCheckbox6" value="option6">
+                      <label class="form-check-label" for="inlineCheckbox6">Originality</label>
+                    </fieldset>
+                  </div>
+		  
+                  <div class="form-check form-check-inline">
+                    <fieldset disabled>
+                      <input class="form-check-input" type="checkbox" id="inlineCheckbox6" value="option6">
+                      <label class="form-check-label" for="inlineCheckbox6">History</label>
+                    </fieldset>
+                  </div>
 
 
                 </div>
-
-
-                <div class="row hide">
-                    <div class="col p-2 ">
-
-                    </div>
+              </div>
+              <div class="row submissionForm">
+                <div class="col p-2 mt-2">
+                  <a type="button" class="btn btn-primary btn-lg buttonResults" onclick="submit_text();">Begin Analysis</a>
                 </div>
-                <div class="row mt-4 hide ">
-
-                    <div class="col-md-2 p-2 mt-2">
-
-                        <ul class="mt-5" id="trust_index_results">
-
-                        </ul>
-                    </div>
-
-                    <div class="col-md-1 p-2 mt-2"></div>
-
-                    <div class="col-md-9 p-2 mt-2" id="trustIndexContainer">
+              </div>
 
 
-
-                    </div>
+              <!--BEGIN RESULTS SECTION-->
+              <div class="row hide-progress">
+                <div class="col p-2 mt-2">
+                  <div id="myProgress">
+                    <div id="myBar"></div>
+                  </div>
                 </div>
+              </div>
 
-                <div class="row mt-5 hide text-center">
+              <div class="row hide" id="results">
+                <div class="col p-2 mt-2">
+                  <h1>Results</h1>
+                  <hr />
+                </div>
+              </div>
+	      
 
-
-
-                    <div class="col p-2 mt-2">
-                        <h3 class="mb-3">Sentiment: <span id="gauge-sentiment-label">45</span></h3>
-
-                        <div class="gauge gauge--liveupdate" id="gauge-sentiment">
-                            <div class="gauge__container">
-                                <div class="gauge__marker"></div>
-                                <div class="gauge__background"></div>
-                                <div class="gauge__center"></div>
-                                <div class="gauge__data"></div>
-                                <div class="gauge__needle"></div>
-                            </div>
-                            <div class="gauge__labels mdl-typography__headline">
-                                <span class="gauge__label--low">Negative</span>
-                                <span class="gauge__label--spacer"></span>
-                                <span class="gauge__label--high">Positive</span>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-
-                    <div class="col p-2 mt-2">
-                        <h3 class="mb-3">Author: <span id="gauge-author-label">100</span></h3>
-                        <div class="gauge gauge--liveupdate" id="gauge-author">
-                            <div class="gauge__container">
-                                <div class="gauge__marker"></div>
-                                <div class="gauge__background"></div>
-                                <div class="gauge__center"></div>
-                                <div class="gauge__data"></div>
-                                <div class="gauge__needle"></div>
-                            </div>
-                            <div class="gauge__labels mdl-typography__headline">
-                                <span class="gauge__label--low">Caution</span>
-                                <span class="gauge__label--spacer"></span>
-                                <span class="gauge__label--high">Trustworthy</span>
-                            </div>
-                        </div>
-                        <p class="lead" id="authorNameGraph"></p>
-
-                    </div>
-                    <div class="col p-2 mt-2">
-                        <h3 class="mb-3">Publishers: <span id="gauge-publisher-label">100</span></h3>
-
-                        <div class="gauge gauge--liveupdate" id="gauge-publishers">
-                            <div class="gauge__container">
-                                <div class="gauge__marker"></div>
-                                <div class="gauge__background"></div>
-                                <div class="gauge__center"></div>
-                                <div class="gauge__data"></div>
-                                <div class="gauge__needle"></div>
-                            </div>
-                            <div class="gauge__labels mdl-typography__headline">
-                                <span class="gauge__label--low">Caution</span>
-                                <span class="gauge__label--spacer"></span>
-                                <span class="gauge__label--high">Trustworthy</span>
-                            </div>
-                        </div>
-                        <p class="lead" id="publisherNameGraph"></p>
-                    </div>
+              <div class="row hide mt-3">
+                <div class="col-md-6 p-2">
+		  
+                  <h2 id="trustedOrNot"></h2>
+                  <h4><span id="inputArticleTitleOutput"></span></h4>
+                  <p id="openingAnalysisMessage"></p>
+                  <div id="messageResultsAnal">
+                  </div>
+                  <p id="warningFlagFakeDatabaseTrue"></p>
+                  <p class="lead"><span id="inputArticleAuthorOutput"></span> | <span id="inputArticlePublisherOutput"></span> </p>
                 </div>
 
-                <div class="row mt-4 hide">
-                    <div class="col-md-12 p-2 mt-2">
-
-
+                <div class="col-md-6 p-2">
+                  <div class="gauge gauge--liveupdate" id="gauge">
+                    <div class="gauge__container">
+                      <div class="gauge__marker"></div>
+                      <div class="gauge__background"></div>
+                      <div class="gauge__center"></div>
+                      <div class="gauge__data"></div>
+                      <div class="gauge__needle"></div>
                     </div>
-                </div>
-
-
-                <div class="row mt-5 hide">
-                    <div class="col-md-7 p-2 mt-2">
-                        <h1 class="py-2">Bywire Artificial Neural Network (BANN)</h1>
-                        <h3>Please rank your answers out of 10, with 10 being very good and 1 being very poor</h3>
-                        <hr />
-
-
-                        <h2 class="my-5">Was this analysis accurate?</h2>
-
-                        <label for="customRange3" class="form-label">Was this analysis accurate?</label>
-                        <input type="range" value="1" name="rangeInput" class="form-range" min="1" max="10" step="1" id="customRange3" onchange="updateTextInput(this.value);">
-
-
-                        <input type="text" class="form-control" id="textInput" value="1" readonly>
-
-                        <script>
-                            function updateTextInput(val) {
-                                document.getElementById('textInput').value = val;
-                            }
-                        </script>
-
-
-                        <h2 class="my-5">How accurate was the trust analysis score in your opinion?</h2>
-
-                        <label for="customRange1" class="form-label">HHow accurate was the trust analysis score in your opinion?</label>
-                        <input type="range" value="1" name="rangeInput1" class="form-range" min="1" max="10" step="1" id="customRange1" onchange="updateTextInput1(this.value);">
-
-
-                        <input type="text" class="form-control" id="textInput1" value="1" readonly>
-
-                        <script>
-                            function updateTextInput1(val) {
-                                document.getElementById('textInput1').value = val;
-                            }
-                        </script>
-
-
-
-                        <h2 class="my-5">How accurate was the sentiment analysis score in your opinion?</h2>
-
-                        <label for="customRange4" class="form-label">How accurate was the sentiment analysis score in your opinion?</label>
-                        <input type="range" value="1" name="rangeInput4" class="form-range" min="1" max="10" step="1" id="customRange4" onchange="updateTextInput4(this.value);">
-
-
-                        <input type="text" class="form-control" id="textInput4" value="1" readonly>
-
-                        <script>
-                            function updateTextInput4(val) {
-                                document.getElementById('textInput4').value = val;
-                            }
-                        </script>
-
-
-
-                        <h2 class="my-5">How accurate was the author analysis score in your opinion?</h2>
-
-                        <label for="customRange5" class="form-label">How accurate was the author analysis score in your opinion?</label>
-                        <input type="range" value="1" name="rangeInput5" class="form-range" min="1" max="10" step="1" id="customRange5" onchange="updateTextInput5(this.value);">
-
-
-                        <input type="text" class="form-control" id="textInput5" value="1" readonly>
-
-                        <script>
-                            function updateTextInput5(val) {
-                                document.getElementById('textInput5').value = val;
-                            }
-                        </script>
-
-
-                        <h2 class="my-5">How accurate was the publisher analysis score in your opinion?</h2>
-
-                        <label for="customRange6" class="form-label">How accurate was the publisher analysis score in your opinion?</label>
-                        <input type="range" value="1" name="rangeInput6" class="form-range" min="1" max="10" step="1" id="customRange6" onchange="updateTextInput6(this.value);">
-
-
-                        <input type="text" class="form-control" id="textInput6" value="1" readonly>
-
-                        <script>
-                            function updateTextInput6(val) {
-                                document.getElementById('textInput6').value = val;
-                            }
-                        </script>
-
-
+                    <div class="gauge__labels mdl-typography__headline">
+                      <span class="gauge__label--low">FAKE</span>
+                      <span class="gauge__label--spacer"></span>
+                      <span class="gauge__label--high">Genuine</span>
                     </div>
+                  </div>
+                  <script src="material-gauge.js"></script>
+                  <h2 class="text-center">Trust Score: <span id="trust_index"></span> </h2>
+                  <p class="text-center flags" onclick="submit_flag();">Flag as <span id="flagAsWhat"></span></p>
                 </div>
+              </div>
+            </div>
 
-                <div class="row mt-4 hide">
-                    <div class="col-md-12 p-2 mt-2">
-                        <button class="btn btn-primary" type="submit" onclick="submit_flag();">Share Feedback with Bywire Neural Network</button>
-                    </div>
+
+            <div class="row hide">
+              <div class="col p-2 ">
+              </div>
+            </div>
+            <div class="row mt-4 hide ">
+
+              <div class="col-md-2 p-2 mt-2">
+
+                <ul class="mt-5" id="trust_index_results">
+
+                </ul>
+              </div>
+
+              <div class="col-md-1 p-2 mt-2"></div>
+	      
+              <div class="col-md-9 p-2 mt-2" id="trustIndexContainer">
+
+
+
+              </div>
+            </div>
+
+            <div class="row mt-5 hide text-center">
+              <div class="col p-2 mt-2">
+                <h3 class="mb-3">Sentiment: <span id="gauge-sentiment-label">45</span></h3>
+		
+                <div class="gauge gauge--liveupdate" id="gauge-sentiment">
+                  <div class="gauge__container">
+                    <div class="gauge__marker"></div>
+                    <div class="gauge__background"></div>
+                    <div class="gauge__center"></div>
+                    <div class="gauge__data"></div>
+                    <div class="gauge__needle"></div>
+                  </div>
+                  <div class="gauge__labels mdl-typography__headline">
+                    <span class="gauge__label--low">Negative</span>
+                    <span class="gauge__label--spacer"></span>
+                    <span class="gauge__label--high">Positive</span>
+                  </div>
                 </div>
+              </div>
+
+              <div class="col p-2 mt-2">
+                <h3 class="mb-3">Author: <span id="gauge-author-label">100</span></h3>
+                <div class="gauge gauge--liveupdate" id="gauge-author">
+                  <div class="gauge__container">
+                    <div class="gauge__marker"></div>
+                    <div class="gauge__background"></div>
+                    <div class="gauge__center"></div>
+                    <div class="gauge__data"></div>
+                    <div class="gauge__needle"></div>
+                  </div>
+                  <div class="gauge__labels mdl-typography__headline">
+                    <span class="gauge__label--low">Caution</span>
+                    <span class="gauge__label--spacer"></span>
+                    <span class="gauge__label--high">Trustworthy</span>
+                  </div>
+                </div>
+                <p class="lead" id="authorNameGraph"></p>
+		
+              </div>
+              <div class="col p-2 mt-2">
+                <h3 class="mb-3">Publishers: <span id="gauge-publisher-label">100</span></h3>
+		
+                <div class="gauge gauge--liveupdate" id="gauge-publishers">
+                  <div class="gauge__container">
+                    <div class="gauge__marker"></div>
+                    <div class="gauge__background"></div>
+                    <div class="gauge__center"></div>
+                    <div class="gauge__data"></div>
+                    <div class="gauge__needle"></div>
+                  </div>
+                  <div class="gauge__labels mdl-typography__headline">
+                    <span class="gauge__label--low">Caution</span>
+                    <span class="gauge__label--spacer"></span>
+                    <span class="gauge__label--high">Trustworthy</span>
+                  </div>
+                </div>
+                <p class="lead" id="publisherNameGraph"></p>
+              </div>
+            </div>
+
+            <div class="row mt-4 hide">
+              <div class="col-md-12 p-2 mt-2">
+              </div>
+            </div>
+
+
+            <div class="row mt-5 hide">
+              <div class="col-md-7 p-2 mt-2">
+                <h1 class="py-2">Bywire Artificial Neural Network (BANN)</h1>
+                <h3>Please rank your answers out of 10, with 10 being very good and 1 being very poor</h3>
+                <hr />
+		
+		
+                <h2 class="my-5">Was this analysis accurate?</h2>
+			
+                <label for="customRange3" class="form-label">Was this analysis accurate?</label>
+                <input type="range" value="1" name="rangeInput" class="form-range" min="1" max="10" step="1" id="customRange3" onchange="updateTextInput(this.value);">
+                <input type="text" class="form-control" id="textInput" value="1" readonly>
+
+                <script>
+                  function updateTextInput(val) {
+                      document.getElementById('textInput').value = val;
+                  }
+                </script>
+
+
+                <h2 class="my-5">How accurate was the trust analysis score in your opinion?</h2>
+		
+                <label for="customRange1" class="form-label">HHow accurate was the trust analysis score in your opinion?</label>
+                <input type="range" value="1" name="rangeInput1" class="form-range" min="1" max="10" step="1" id="customRange1" onchange="updateTextInput1(this.value);">
+
+
+                <input type="text" class="form-control" id="textInput1" value="1" readonly>
+
+                <script>
+                  function updateTextInput1(val) {
+                      document.getElementById('textInput1').value = val;
+                  }
+                </script>
+
+
+
+                <h2 class="my-5">How accurate was the sentiment analysis score in your opinion?</h2>
+		
+                <label for="customRange4" class="form-label">How accurate was the sentiment analysis score in your opinion?</label>
+                <input type="range" value="1" name="rangeInput4" class="form-range" min="1" max="10" step="1" id="customRange4" onchange="updateTextInput4(this.value);">
+
+
+                <input type="text" class="form-control" id="textInput4" value="1" readonly>
+
+                <script>
+                  function updateTextInput4(val) {
+                      document.getElementById('textInput4').value = val;
+                  }
+                </script>
+
+
+
+                <h2 class="my-5">How accurate was the author analysis score in your opinion?</h2>
+
+                <label for="customRange5" class="form-label">How accurate was the author analysis score in your opinion?</label>
+                <input type="range" value="1" name="rangeInput5" class="form-range" min="1" max="10" step="1" id="customRange5" onchange="updateTextInput5(this.value);">
+
+
+                <input type="text" class="form-control" id="textInput5" value="1" readonly>
+
+                <script>
+                  function updateTextInput5(val) {
+                      document.getElementById('textInput5').value = val;
+                  }
+                </script>
+
+
+                <h2 class="my-5">How accurate was the publisher analysis score in your opinion?</h2>
+		
+                <label for="customRange6" class="form-label">How accurate was the publisher analysis score in your opinion?</label>
+                <input type="range" value="1" name="rangeInput6" class="form-range" min="1" max="10" step="1" id="customRange6" onchange="updateTextInput6(this.value);">
+
+
+                <input type="text" class="form-control" id="textInput6" value="1" readonly>
+
+                <script>
+                  function updateTextInput6(val) {
+                      document.getElementById('textInput6').value = val;
+                  }
+                </script>
+
+
+              </div>
+            </div>
+
+            <div class="row mt-4 hide">
+              <div class="col-md-12 p-2 mt-2">
+                <button class="btn btn-primary" type="submit" onclick="submit_flag();">Share Feedback with Bywire Neural Network</button>
+              </div>
+            </div>
 
 
 
@@ -613,8 +582,8 @@
 
 
 
-            </div>
-            <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+          </div>
+          <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="container-fluid">
                     <div class="row mt-3">
                         <div class="col-12 p-2">
