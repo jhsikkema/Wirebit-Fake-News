@@ -32,7 +32,7 @@
 
 </head>
 
-<body>
+<body id="top">
 
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="bootstrap" viewBox="0 0 118 94">
@@ -145,7 +145,7 @@
                 </li>
             </ul>
             <hr />
-            <div class="dropdown">
+            <!--<div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
                     <strong>Hello, Michael</strong>
@@ -159,7 +159,7 @@
                     </li>
                     <li><a class="dropdown-item" href="#">Sign out</a></li>
                 </ul>
-            </div>
+            </div>-->
         </div>
         <div class="b-example-divider"></div>
 
@@ -469,7 +469,7 @@
                 <div class="row mt-5 hide">
                     <div class="col-md-7 p-2 mt-2">
                         <h1 class="py-2">Bywire Artificial Neural Network (BANN)</h1>
-                        <h3>Please rank your answers out of ten, with ten being very good and 1 being very poor</h3>
+                        <h3>Please rank your answers out of 10, with 10 being very good and 1 being very poor</h3>
                         <hr />
 
 
@@ -555,7 +555,7 @@
 
                 <div class="row mt-4 hide">
                     <div class="col-md-12 p-2 mt-2">
-                        <button class="btn btn-primary" type="submit">Share Feedback with Bywire Neural Network</button>
+                        <button class="btn btn-primary" type="submit" onclick="submit_flag();">Share Feedback with Bywire Neural Network</button>
                     </div>
                 </div>
 
@@ -923,23 +923,23 @@
                 </div>
               </div>
             </div>
-            <div class="tab-pane" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+	    <div class="tab-pane" id="settings" role="tabpanel" aria-labelledby="settings-tab">
               <div class="container-fluid">
                 <div class="row mt-3">
                   <div class="col-12 p-4">
-                    <div class="col-12 p-4">
-                      <h1>Show your readers that your news is genuine</h1>
-                      <hr />
-                      <p class="lead">Bywire News is creating the new digital trust certification standard for
-			news and content. Make use of our trust API and decentralised your content across blockchains, and show a certifica
-			te of trust to your readers.
-
-                      </p>
-                      <img src="images/cert-example.png">
-                    </div>
+                    <h1>Show your readers that your news is genuine</h1>
+                    <hr />
+                    <p class="lead">Bywire News is creating the new digital trust certification standard for news and content. Make use of our trust API and decentralise your content across two blockchains and show a certificate of trust to your readers.
+                    </p>
+                    <p class="lead">Using Expert.AI and Bywire custom algorithms, your readers can rest assured that the content they consume has been objectively reviewed and declared genuine by a transparent and accessible standard bearer. </p>
+                    <p class="lead">Should our AI tools display a caution or even fake warning, then you will have all the tools necessary to inform you on how you can improve your scores and authenticity to ensure that you achieve the very highest standard of
+                      truth for your readers.
+                    </p>
+                    <p class="lead">Example of the Bywire News trust certificates in action below. You can also see this technology LIVE at <a href="https://buwire.news" target="_blank">Bywire.news</a></p>
+                    <img src="images/cert-example.png">
                   </div>
-		</div>
-	      </div>
+                </div>
+              </div>
 	    </div>
             <div class="tab-pane" id="last" role="tabpanel" aria-labelledby="settings-tab">
                 <div class="container">
@@ -1167,6 +1167,13 @@
 
     <script>
 
+      function submit_flag() {
+	  alert("Thank you for submitting your feedback!")
+	  FakeNewsAPI.submit_flag()
+	  scrollTop("")
+
+      }
+      
       var requests = {}
       var current_id = ""
 
@@ -1222,7 +1229,7 @@
                   "is_expert": false,
                   "strength": strength
               }
-              send_to_api("flag", data, FakeNewsAPI.check_api)
+              //FakeNewsAPI.send_to_api("flag", data, FakeNewsAPI.check_api)
           }
 
           static submit_ipfs(hash) {
@@ -1766,7 +1773,18 @@
 
 
     <script>
-        function scrollBottom(postfix) {
+      function scrollTop(postfix) {
+            setTimeout(function() {
+                //window.scrollTo(0, document.body.scrollHeight);
+                let element = document.getElementById("top")
+                element.scrollIntoView();
+            },
+                       200
+		      )
+        }
+
+
+      function scrollBottom(postfix) {
             setTimeout(function() {
                     //window.scrollTo(0, document.body.scrollHeight);
                     let element = document.getElementById("results"+postfix);
