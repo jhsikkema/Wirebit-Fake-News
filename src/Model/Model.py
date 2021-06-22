@@ -8,6 +8,7 @@ from Util.Config import Config
 from Util.Log import Log
 
 from Database.Trust	      import Trust
+from Database.TrustFlagged    import TrustFlagged
 from Database.TrustArticle    import TrustArticle
 from Database.TrustParameters import TrustParameters
 from Model.ModelConst import ModelConst
@@ -29,8 +30,8 @@ class Model(object):
 		self.m_model_path = os.path.join(base_path, "model_{0:s}.json".format(Model.VERSION))
 		self.m_coeff_path = os.path.join(base_path, "coeff_{0:s}.h5".format(Model.VERSION))
 
-	def flagged(self, trust_article):
-		flag = TrustFlagged.get(trust_article.id)
+	def flagged(self, id):
+		flag = TrustFlagged.get(id)
 		if not(flag):
 			return 0
 		return 2*flag.reader.strength/200 + 1

@@ -16,7 +16,7 @@
   <model>
     <path> Config/Model </path>
     <version> 0.1 </version>
-    <type> heuristic </type>
+    <type> ann </type>
     <ann>
       <layers> 12|8 </layers>
       <epochs> 150 </epochs>

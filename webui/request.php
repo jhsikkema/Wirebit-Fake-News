@@ -36,7 +36,8 @@ function call_api($method, $url, $data = false) {
 $action        = $_REQUEST["action"];
 $data          = json_decode($_REQUEST["data"]);
 //print_r($data);
-$server = "ec2-99-81-187-79.eu-west-1.compute.amazonaws.com:5055";
+//$server = "ec2-99-81-187-79.eu-west-1.compute.amazonaws.com:5055";
+$server = "ec2-54-75-171-71.eu-west-1.compute.amazonaws.com:5055";
 $routes = array("text"=>$server."/analyze/text",
 		"ipfs"=>$server."/analyze/ipfs",
 		"flag"=>$server."/analyze/flag",
