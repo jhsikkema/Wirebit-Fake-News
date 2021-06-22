@@ -126,6 +126,8 @@ Here are some examples of fake news stories and real news stories. The IPFS hash
   - HSBC offers sub-1% mortgage as interest rate war intensifies. \*\*Bywire Trust: 86 - ipfs: \*\*. The article can be found [here](https://www.theguardian.com/money/2021/jun/18/hsbc-mortgage-interest-rate-banks-building-societies-house-prices)
   - Praise and condemnation for Iran&#39;s new hardline president. \*\*Bywire Trust: 61 - ipfs \*\*. The article can be found [here](https://www.reuters.com/world/middle-east/praise-disdain-irans-new-hardline-president-2021-06-19/)
 
+Scores may have changed slightly due to better tuning of our algorithm, but the conclusions stay the same.
+
 ## HOW IT WORKS
 
 [This](bywire.online) is a demo site as a prototype for fake news detection using expert ai.
