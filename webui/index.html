@@ -386,10 +386,8 @@
 
                     <div class="col-md-1 p-2 mt-2"></div>
 
-                    <div class="col-md-9 p-2 mt-2">
+                    <div class="col-md-9 p-2 mt-2" id="trustIndexContainer">
 
-
-                        <canvas id="trustIndexChart" width="100%" height="50%"></canvas>
 
 
                     </div>
@@ -1061,7 +1059,7 @@
 
           static submit_text(content, title, author, publisher) {
               var data = {
-                  "content": content,
+                  "content": title+"\n\n"+content,
                   "title": title,
                   "platform": "prototype",
                   "author": author,
@@ -1283,10 +1281,12 @@
           const resultsValues = (Object.values(resultsTemp));
 
           //CHART.JS
-          let ctx = document.getElementById('trustIndexChart');
-
-
-
+          let container = document.getElementById('trustIndexContainer')
+	  
+	  $('#trustIndexChart').remove(); // this is my <canvas> element
+	  $('#trustIndexContainer').append('<canvas id="trustIndexChart" width="100%" height="50%"></canvas>')
+	  
+          let ctx = document.getElementById('trustIndexChart')
           var myChart = new Chart(ctx, {
               type: 'bar',
               data: {
@@ -1505,21 +1505,30 @@
       var examples = [];
 
       $('#simDataListIPFS').change(function() {
-	  var key = $(this).index()-1
-	  document.getElementById("ipfs-input").innerHTML = examples[key]["ipfs"]
-	  if (examples[key]["ipfs"]) {
-	      FakeNewsAPI.submit_ipfs(examples[key]["ipfs"])
+	  //var key = $(this).index()-1
+	  var val = $(this).val()
+	  for (var key in examples) {
+	      if (examples[key]["key"] === val) {
+		  document.getElementById("ipfs-input").innerHTML = examples[key]["ipfs"]
+		  if (examples[key]["ipfs"]) {
+		      FakeNewsAPI.submit_ipfs(examples[key]["ipfs"])
+		  }
+	      }
 	  }
       });
       $('#simDataList').change(function() {
-	  var key = $(this).index()-1
-          document.getElementById("inputTitle").innerHTML = examples[key]["title"];
-          document.getElementById("inputWebsite").innerHTML = "";
-          document.getElementById("inputAuthor").innerHTML = examples[key]["author"];
-          document.getElementById("inputPublisher").innerHTML = examples[key]["publisher"];
-          document.getElementById("inputNewsArticle").innerHTML = examples[key]["article_content"];
-	  submit_text();
-
+	  //var key = $(this).index()-1
+	  var val = $(this).val()
+	  for (var key in examples) {
+	      if (examples[key]["key"] === val) {
+		  document.getElementById("inputTitle").value       = examples[key]["title"];
+		  document.getElementById("inputWebsite").value     = examples[key]["url"];
+		  document.getElementById("inputAuthor").value      = examples[key]["author"];
+		  document.getElementById("inputPublisher").value   = examples[key]["publisher"];
+		  document.getElementById("inputNewsArticle").value = examples[key]["article_content"];
+		  submit_text();
+	      }
+	  }
 	  
       });
 
@@ -1528,7 +1537,8 @@
 	  for (key in  examples) {
 	      let option = document.createElement("option");
 	      let prefix = (examples[key]["fake"]) ? "FAKE: " : "TRUE: ";
-	      option.value = prefix+examples[key]["title"]
+	      examples[key]["key"] = prefix+examples[key]["title"]
+	      option.value         = prefix+examples[key]["title"]
 	      //option.onchange = 'show_example("'+key+'");'
 	      option.innerHTML = prefix+examples[key]["title"]
 	      el.appendChild(option)
