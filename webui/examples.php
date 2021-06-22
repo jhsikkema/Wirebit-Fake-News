@@ -3,7 +3,7 @@ $examples = [array("title"=>"NYC Coroner That Declared Epstein’s Death ‘Suic
 	    "publisher"=>"Taters Gonna Tate",
 	    "author"=>"Flagg Eagleton-Patriot",
 	    "article content"=>"An independent investigation by credible sources that may or may not be tied to the federal task force to investigate the Clintons has found that the New York City coroner who signed Jeffrey Epstein’s death cerificate was on the Clinton Foundation’s Board of Trustees until 2015. This report, which is an alleged excerpt from the Foundation’s public filings, has not been doctored at all. It shows clearly that Eric Braverman, the same man who declared Epstein’s death a suicide, made nearly $500K in 2015 for a cushy 45-hour per week job. At first, our investigators were skeptical, because the Coroner’s name isn’t technically \"Eric Braverman\" at all. It’s Dr. Arturo Tubbolski under the assumed name of Greg. Our investigator in the field, Skip Tetheluda, explains\" Greg was first hired as Art, but then his roommate transitioned from Leon to Linda, which made him a little uncomfortable. He moved in with Chelsea Clinton’s best friend from Dartmouth and before long he had taken over the position of Eric Braverman, the Foundation’s chief Operating Officer. We believe the real Braverman is buried wherever they put Vince Foster and Dimitri Noonan. Anyway, the fact that both men are listed makes this a slam dunk, yet the New York Attorney General, Sandiford Batt, won’t press charges. It’s a clear-cut caes of the Deep State covering their crimes.” Well if that doesn’t make perfect sense then nothing does. At this point, this Greg character needs to be found and locked up. According to the City of New York, he never worked there at all. Because Epstein has no family and left no will, there’s nobody to contest it. At least it’s finally over. We’ll never know how many of Clinton’s 26 trips were actually true now.",
-	    "ipfs"=>"",
+	    "ipfs"=>"QmP6b1FEGdERapaXukXe897aAMhaethHLBxoxgxVDW9WDA",
 	    "fake"=>True),
 	    array("title"=>"Biden Calls Trump and Supporters “Dregs of Society”",
 	    "publisher"=> "",
@@ -29,7 +29,7 @@ Corrie O'Connor",
        "article_content"=>"News outlets around the world are reporting on the news that Pope Francis has made the unprecedented decision to endorse a US presidential candidate. His statement in support of Donald Trump was released from the Vatican this evening:
 
 “I have been hesitant to offer any kind of support for either candidate in the US presidential election but I now feel that to not voice my concern would be a dereliction of my duty as the Holy See.",
-       "ipfs"=>"",
+       "ipfs"=>"QmbKYe23oNfZF68srw2gmC5wzB5A4ZCywQTWf9VMkCDkLj",
        "fake"=>True),
        array("title"=>"Nancy Pelosi’s Son Was Exec At Gas Company That Did Business In Ukraine",
        "author"=>"",
@@ -97,7 +97,7 @@ As a result, the average price of a house in Britain has hit a high of £242,832
 Mark Harris, the chief executive of mortgage broker SPF Private Clients, said it was a “super-competitive market for borrowers” with banks eager to lend given the low base rate. “We are sitting here thinking how much lower can rates go?” he added.
 
 “There is a desire from the big balance sheet lenders who have got cash on their book at zero in terms of paying deposit rates, so even if it is going out the door at 1%, while that margin is skinny, it is still a margin.”",
-       "ipfs"=>"",
+       "ipfs"=>"QmeQaqQt9T6Sjm2aoqnWGtbWGtVqA1sexATagHTdYpgUPc",
        "fake"=>False),
        array("title"=>"Juneteenth: After decades, Opal Lee finally gets her day off",	
        "author"=>"",
@@ -180,8 +180,25 @@ With each footstep, Ms Lee walked closer to her goal.
 This year, she'll tread the same path knowing the hard yards have been done.
 
 \"Walking tomorrow is going to be a joy,\" she told ABC News's Good Morning America programme. \"We need to go about the business of everybody participating.\"",
-	  "ipfs"=>"",
-	  "fake"=>False)
+	  "ipfs"=>"Qmb7w5od5WVfzzE2mcAV3H2mRUAGcjJ9NEgwRatQNVzyWV",
+	  "fake"=>False),
+       array("title"=>"Frost warns there will be a problem if EU isn't more realistic",
+       "author"=>"William James",
+       "publisher"=>"Bywire",
+       "url"=>"https://bywire.news/articles/frost-warns-there-will-be-a-problem-if-eu-isnt-more-realistic",
+       "article_content"=>"Brexit minister Frost has said that if the EU is not more realistic in its approach to the Northern Ireland part of the Brexit divorce deal, issues will arise.
+
+LONDON (Bywire News) - On Tuesday, David Frost, the British Brexit minister, said that there will be \"a problem\" if the European Union isn't more realistic over the implementation of the Northern Ireland trade segment of the Brexit divorce deal.
+
+Frost said to a parliamentary committee, \"What we would want to see is a kind of more pragmatic approach from the EU. If their approach is simply to say, you must just implement the EU customs' code as if this were any other external frontier of the EU, then we obviously have a problem.\" 
+
+According to Frost, currently, the EU is behaving in a non-practical manner. 
+
+\"That's not what's happening. The delicate balance in the Good Friday Agreement risks being unsettled.\"
+
+(Reporting by William James; writing by Michael Holden and Klaudia Fior; editing by Alistair Smout)",
+	   "ipfs"=>"QmY2GGi3PLaGapeaP4ma4MLVXqma2T8AAcrEzizDnY9DCz",
+	   "fake"=>False)
 ];
 
 echo json_encode($examples);
