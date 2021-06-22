@@ -1,8 +1,23 @@
 """
-	Copyright Sikkema Software 2017. 
-	No liabilities or rights can be derived from the correct working of 
-	this software or.
+
+	Copyright Sikkema Software B.V. 2021 - All rights Reserved
+
+	You may not copy, reproduce, distribute, modify or create 
+	derivative works sell or offer it for sale or use such content
+	to construct any kind of database or disclose the source without
+	explicit permission of the copyright holder. You may not alter
+	or remove any copyright or other notices from copies of the content. 
+	For permission to use the content please contact sikkemasoftware@gmailcom
+
+	All content and data is provided on an as is basis. The copyright holder
+	makes no claisms to the accuracy, complentness, currentness, suistainability
+	or validity of the code and information and will not be liable for any
+	errors, omissions, or delays in this information or any losses, injuries
+	or damages arising from the use of this software. 
+
 """
+
+
 from Util.Const import Const
 import os, os.path
 from datetime import datetime, timedelta
@@ -14,11 +29,11 @@ class Lock(object):
 	
 	def __init__(self, config):
 		self.m_path = config[Const.LOCK_FILE]
-		self.m_timeout   = config[Const.LOCK_TIMEOUT]
-		self.m_timeout   = [int(item) for item in self.m_timeout.split(':')]
-		self.m_timeout   = timedelta(hours=self.m_timeout[0], minutes=self.m_timeout[1], seconds=self.m_timeout[2])
+		self.m_timeout	 = config[Const.LOCK_TIMEOUT]
+		self.m_timeout	 = [int(item) for item in self.m_timeout.split(':')]
+		self.m_timeout	 = timedelta(hours=self.m_timeout[0], minutes=self.m_timeout[1], seconds=self.m_timeout[2])
 		self.m_separator = config[Const.LOCK_SEPARATOR]
-		self.m_format    = config[Const.LOCK_FORMAT]
+		self.m_format	 = config[Const.LOCK_FORMAT]
 		
 	def __enter__(self):
 		self.m_re_entrant = False
