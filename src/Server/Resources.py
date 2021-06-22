@@ -11,9 +11,10 @@ from Util.Config import Config
 from Util.Log import Log
 from datetime import datetime, timedelta
 from Util.DataUtil import DataUtil
-from Server.Parsers import analyze_text_parser, analyze_ipfs_parser, analyze_query_parser
+from Server.Parsers import analyze_text_parser, analyze_ipfs_parser, analyze_query_parser, analyze_flag_parser
 from Server.Messages import Messages
 from Database.Trust import Trust
+from Database.TrustFlagged import TrustFlagged
 from Database.Article import Article
 from Database.Request import Request
 global ipfs_server
@@ -64,6 +65,12 @@ class AnalyzeQuery(Resource):
 		msg = {"id": id, "status": "Done", "done": True, "data": trust.toJSON()}
 		for (key, value) in msg["data"].items():
 			msg["data"][key] = int(value) if isinstance(value, float) else value
+		flagged = TrustFlagged.get(id)
+		msg["data"]["is_flagged"] = False
+		if (flagged):
+			if (flagged.reader_strength > 0):
+				msg["data"]["is_flagged"] = True
+				msg["data"]["reasons"].append("Was Flagged as Fake")
 		if (id.startswith("IPFS_")):
 			article = Article.get(id)
 			msg["text"] = article.content
@@ -74,8 +81,11 @@ class AnalyzeFlag(Resource):
 	def post(self):
 		data	= analyze_flag_parser.parse_args()
 		data	= DataUtil.clean_data(data)
+		Log.info(data)
+		data["strength"] = float(data["strength"])
+		Log.info(data)
 		if (data["strength"] < -100 or data["strength"] > 100):
-			return {"status": "Error", "done": True, "error": True, "message": "Strength must lie between -100 to +100"}, 500
+			return {"status": "Error", "done": True, "error": True, "message": "Strength must lie between -100 to +100", "flagged": False}, 500
 		id	= data["id"]
 		trust	= TrustFlagged.get(id)
 		if not(trust):
@@ -88,12 +98,12 @@ class AnalyzeFlag(Resource):
 			})
 		if (data["is_expert"]):
 			trust.expert_vote += 1
-			trust.expert_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
+			trust.expert_strength = (data["strength"] + (trust.expert_vote-1)*trust.expert_strength)/max(1, trust.expert_vote)
 		else:
 			trust.reader_vote += 1
-			trust.reader_strength = (data["strength"] + (this.expert_vote-1)*this.expert_strength)/max(1, this.expert_vote)
+			trust.reader_strength = (data["strength"] + (trust.reader_vote-1)*trust.reader_strength)/max(1, trust.reader_vote)
 		trust.flush()
-		return {"status": "Done", "done": True}, 200
+		return {"status": "Done", "done": True, "flagged": True}, 200
 
 class RecalculateParameters(Resource):
 	def post(self):

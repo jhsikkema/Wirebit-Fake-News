@@ -94,7 +94,6 @@ class Model(object):
 		divergency_com = abs(trust_article.complexity_expertai/b1 - trust_article.complexity_complexity/b2)
 
 		divergency = max(divergency_pos, divergency_pos, divergency_com)
-
 		baserate   = parameters["baserate"]
 			
 		norm = lambda x: max(0, min(1, x))
@@ -144,6 +143,7 @@ class Model(object):
 		trust["param_version"] = self.m_param_version
 		trust["reasons"]       = self.reasons(features)
 
+		trust["trust_score"] = max(51, trust["trust_score"]) if trust_article.platform == "bywire" else trust["trust_score"]
 		trust = Trust.fromJSON(trust)
 		trust.flush()
 		return trust
